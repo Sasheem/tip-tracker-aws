@@ -1,0 +1,8 @@
+type Shift @model {
+  id: ID!
+  date: String!
+  amount: String
+  inTime: String
+  outTime: String
+  tags: [String]
+}
