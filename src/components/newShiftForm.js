@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	View,
 	StyleSheet,
@@ -7,17 +7,44 @@ import {
 	Text,
 	TextInput,
 	Button,
+	TouchableOpacity,
+	Alert,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import moment from 'moment';
+import { AntDesign } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
+
+import ShiftTag from './shiftTag';
+
+/**
+ * todo add functionality to arrow buttons to modify date label
+ * todo add aws functionality to write shift to database
+ */
 
 const NewShiftForm = () => {
 	const [id, setId] = useState('');
-	const [earnings, setEarnings] = useState('');
+	const [date, setDate] = useState('');
+	const [earnings, setEarnings] = useState();
+	const [inTime, setInTime] = useState('');
+	const [outTime, setOutTime] = useState('');
+	const [job, setJob] = useState('server');
+	const [tag, setTag] = useState('');
+	const [tags, setTags] = useState([]);
 	const [isInTimePickerVisible, setInTimePickerVisibility] = useState(false);
 	const [isOutTimePickerVisible, setOutTimePickerVisibility] = useState(false);
-	const [tags, setTags] = useState([]);
+	const [tagError, setTagError] = useState('');
+	const [formError, setFormError] = useState('');
 
 	// helper functions
+	const onEarningsChange = (earnings) => {
+		setFormError('');
+		setEarnings(earnings);
+	};
+	const onTagChange = (text) => {
+		setTagError('');
+		setTag(text);
+	};
 	const showInTimePicker = () => setInTimePickerVisibility(true);
 	const showOutTimePicker = () => setOutTimePickerVisibility(true);
 	const hideInTimePicker = () => setInTimePickerVisibility(false);
@@ -25,53 +52,180 @@ const NewShiftForm = () => {
 
 	// handle in time confirmed
 	const handleInTimeConfirm = (date) => {
-		console.warn('An in time has been selected', date);
-		console.log(`Type is ${typeof date}`);
+		setInTime(date.toISOString());
 		hideInTimePicker();
 	};
 
 	// handle out time confirmed
 	const handleOutTimeConfirm = (date) => {
-		console.warn('An out time has been selected', date);
+		setOutTime(date.toISOString());
+		hideOutTimePicker();
+	};
+
+	// handle create tag
+	const handleCreateTag = () => {
+		// check if tag input has value
+		if (tag === '') {
+			return setTagError('Enter a tag value');
+		}
+		// check if tags array is empty
+		if (tags.length === 0) {
+			setTags([tag]);
+			setTag('');
+		} else {
+			// if not, check if tag already exists
+			if (tags.includes(tag)) {
+				setTagError('Tag already exists');
+			} else {
+				// if not, concatenate tag to array and clear input field
+				setTags([...tags, tag]);
+				setTag('');
+			}
+		}
+	};
+
+	// handle form submit, create shift
+	const handleSubmit = () => {
+		if (earnings !== '') {
+			return setFormError('Enter amount for earnings');
+		}
+
+		if (job === 'default') {
+			return setFormError('Select a job');
+		}
+
+		console.log(`Earnings: $${earnings}.00`);
+		console.log(`Job: ${job}`);
+		console.log(`In Time: ${inTime}`);
+		console.log(`Out Time: ${outTime}`);
+		console.log(`# of Shift Tags: ${tags.length}`);
 	};
 
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-			<View style={styles.formComponent}>
+			<View style={styles.container}>
 				{/* Filler Component Margin Top */}
 				<View style={styles.filler} />
-				<View style={styles.rowComponent}>
-					<Text style={styles.titleText}>Create a shift</Text>
-				</View>
 
-				{/* Form Row: Earnings */}
-				<View style={styles.rowComponent}>
-					<Text>Enter earnings</Text>
-					<TextInput placeholder='$0.00' />
-				</View>
+				{/* Form Component */}
+				<View style={styles.formComponent}>
+					<View>
+						<Text style={styles.titleText}>Create a shift</Text>
+					</View>
 
-				{/* Form Row: In Time */}
-				<View style={styles.rowComponent}>
-					<Text>Enter In-Time</Text>
-					<Button title='Select In Time' onPress={showInTimePicker} />
-					<DateTimePickerModal
-						isVisible={isInTimePickerVisible}
-						mode='time'
-						onConfirm={handleInTimeConfirm}
-						onCancel={hideInTimePicker}
-					/>
-				</View>
+					{/* Form Row: Date */}
+					<View
+						style={{
+							backgroundColor: 'pink',
+							flexDirection: `row`,
+							justifyContent: `space-evenly`,
+							alignItems: `center`,
+						}}
+					>
+						<AntDesign name='left' size={35} color='black' />
+						<Text>{moment().format('L')}</Text>
+						<AntDesign name='right' size={35} color='black' />
+					</View>
 
-				{/* Form Row: Out Time */}
-				<View style={styles.rowComponent}>
-					<Text>Enter Out-Time</Text>
-					<Button title='Select Out Time' onPress={showOutTimePicker} />
-					<DateTimePickerModal
-						isVisible={isOutTimePickerVisible}
-						mode='time'
-						onConfirm={handleOutTimeConfirm}
-						onCancel={hideOutTimePicker}
-					/>
+					{/* Form Row: Earnings + Job */}
+					<View style={{ flexDirection: `row` }}>
+						<View style={styles.rowComponent}>
+							<Text style={styles.subtitleText}>Enter earnings</Text>
+							<TextInput
+								placeholder='$0.00'
+								autoFocus={true}
+								keyboardType='decimal-pad'
+								style={{ height: 50, width: 150 }}
+								onChangeText={(text) => onEarningsChange(text)}
+								value={earnings}
+							/>
+						</View>
+						<View style={styles.rowComponent}>
+							<Text style={styles.subtitleText}>Select a job</Text>
+							<Picker
+								selectedValue={job}
+								style={{ height: 50, width: 130 }}
+								onValueChange={(itemValue, itemIndex) => setJob(itemValue)}
+							>
+								<Picker.Item label='-- default --' value='default' />
+								<Picker.Item label='Server' value='server' />
+								<Picker.Item label='Bartender' value='bar' />
+								<Picker.Item label='Key' value='key' />
+							</Picker>
+						</View>
+					</View>
+
+					{/* Form Row: In Time + Out Time */}
+					<View style={{ flexDirection: `row` }}>
+						<View style={styles.rowComponent}>
+							<Text style={styles.subtitleText}>Enter In-Time</Text>
+							<Button title='Select In Time' onPress={showInTimePicker} />
+							{inTime !== '' && <Text>{moment(inTime).format('hh:mm a')}</Text>}
+							<DateTimePickerModal
+								isVisible={isInTimePickerVisible}
+								mode='time'
+								onConfirm={handleInTimeConfirm}
+								onCancel={hideInTimePicker}
+							/>
+						</View>
+						<View style={styles.rowComponent}>
+							<Text style={styles.subtitleText}>Enter Out-Time</Text>
+							<Button title='Select Out Time' onPress={showOutTimePicker} />
+							{outTime !== '' && (
+								<Text>{moment(outTime).format('hh:mm a')}</Text>
+							)}
+							<DateTimePickerModal
+								isVisible={isOutTimePickerVisible}
+								mode='time'
+								onConfirm={handleOutTimeConfirm}
+								onCancel={hideOutTimePicker}
+							/>
+						</View>
+					</View>
+
+					{/* Form Row: Shift Tags */}
+					<View style={{ justifyContent: `space-evenly` }}>
+						<Text style={styles.subtitleText}>Add Shift Tags</Text>
+						<View
+							style={{
+								flexDirection: `row`,
+								alignItems: `center`,
+								backgroundColor: `lightgreen`,
+								height: 50,
+								width: `100%`,
+							}}
+						>
+							{tags.length !== 0 &&
+								tags.map((tag) => <ShiftTag key={tag} text={tag} />)}
+						</View>
+
+						<View style={{ flexDirection: `row` }}>
+							<TextInput
+								placeholder="Ex: Mother's Day"
+								style={{ height: 50, flex: 3 }}
+								onChangeText={(text) => onTagChange(text)}
+								value={tag}
+							/>
+							<View style={{ flex: 1 }}>
+								<TouchableOpacity onPress={handleCreateTag}>
+									<AntDesign name='plus' size={32} color='blue' />
+								</TouchableOpacity>
+							</View>
+						</View>
+
+						{/* Conditionally render error message */}
+						{tagError !== '' && (
+							<Text style={{ backgroundColor: `red` }}>{tagError}</Text>
+						)}
+
+						{/* Submit Data to database button */}
+						<View>
+							<Button onPress={handleSubmit} title='Create Shift' />
+						</View>
+						{formError !== '' && (
+							<Text style={{ backgroundColor: `red` }}>{formError}</Text>
+						)}
+					</View>
 				</View>
 
 				{/* Filler Component Margin Bottom */}
@@ -82,10 +236,13 @@ const NewShiftForm = () => {
 };
 
 const styles = StyleSheet.create({
-	formComponent: {
+	container: {
 		flex: 1,
 		width: `80%`,
 		justifyContent: `center`,
+	},
+	formComponent: {
+		flex: 5,
 	},
 	rowComponent: {
 		flex: 1,
@@ -94,7 +251,11 @@ const styles = StyleSheet.create({
 		flex: 2,
 	},
 	titleText: {
-		fontSize: 20,
+		fontSize: 24,
+		fontWeight: `bold`,
+	},
+	subtitleText: {
+		fontSize: 16,
 		fontWeight: `bold`,
 	},
 });
