@@ -1,10 +1,14 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import CalendarComponent from '../components/calendarComponent';
+import CalendarDetail from '../components/calendarDetail';
+
 const ViewCalendar = () => {
 	return (
 		<View style={styles.container}>
-			<Text>Calendar View of Shifts</Text>
+			<CalendarComponent />
+			<CalendarDetail />
 		</View>
 	);
 };
@@ -12,9 +16,8 @@ const ViewCalendar = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
-		alignItems: 'center',
-		justifyContent: 'center',
+		height: `100%`,
+		width: `100%`,
 	},
 });
 
