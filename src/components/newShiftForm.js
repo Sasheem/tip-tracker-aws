@@ -25,10 +25,10 @@ import ShiftTag from './shiftTag';
 const NewShiftForm = () => {
 	const [id, setId] = useState('');
 	const [date, setDate] = useState('');
-	const [earnings, setEarnings] = useState();
+	const [earnings, setEarnings] = useState('');
 	const [inTime, setInTime] = useState('');
 	const [outTime, setOutTime] = useState('');
-	const [job, setJob] = useState('server');
+	const [job, setJob] = useState('default');
 	const [tag, setTag] = useState('');
 	const [tags, setTags] = useState([]);
 	const [isInTimePickerVisible, setInTimePickerVisibility] = useState(false);
@@ -37,9 +37,10 @@ const NewShiftForm = () => {
 	const [formError, setFormError] = useState('');
 
 	// helper functions
-	const onEarningsChange = (earnings) => {
+	const onEarningsChange = (text) => {
 		setFormError('');
-		setEarnings(earnings);
+		console.log(`text: ${text}`);
+		setEarnings(text);
 	};
 	const onTagChange = (text) => {
 		setTagError('');
@@ -86,7 +87,7 @@ const NewShiftForm = () => {
 
 	// handle form submit, create shift
 	const handleSubmit = () => {
-		if (earnings !== '') {
+		if (earnings === '') {
 			return setFormError('Enter amount for earnings');
 		}
 
@@ -116,15 +117,14 @@ const NewShiftForm = () => {
 					{/* Form Row: Date */}
 					<View
 						style={{
-							backgroundColor: 'pink',
 							flexDirection: `row`,
 							justifyContent: `space-evenly`,
 							alignItems: `center`,
 						}}
 					>
-						<AntDesign name='left' size={35} color='black' />
+						<AntDesign name='left' size={24} color='black' />
 						<Text>{moment().format('L')}</Text>
-						<AntDesign name='right' size={35} color='black' />
+						<AntDesign name='right' size={24} color='black' />
 					</View>
 
 					{/* Form Row: Earnings + Job */}
@@ -133,7 +133,7 @@ const NewShiftForm = () => {
 							<Text style={styles.subtitleText}>Enter earnings</Text>
 							<TextInput
 								placeholder='$0.00'
-								autoFocus={true}
+								// autoFocus={true}
 								keyboardType='decimal-pad'
 								style={{ height: 50, width: 150 }}
 								onChangeText={(text) => onEarningsChange(text)}
@@ -144,10 +144,10 @@ const NewShiftForm = () => {
 							<Text style={styles.subtitleText}>Select a job</Text>
 							<Picker
 								selectedValue={job}
-								style={{ height: 50, width: 130 }}
+								style={{ height: 50 }}
 								onValueChange={(itemValue, itemIndex) => setJob(itemValue)}
 							>
-								<Picker.Item label='-- default --' value='default' />
+								<Picker.Item label='Pick a job' value='default' />
 								<Picker.Item label='Server' value='server' />
 								<Picker.Item label='Bartender' value='bar' />
 								<Picker.Item label='Key' value='key' />
@@ -189,8 +189,25 @@ const NewShiftForm = () => {
 						<View
 							style={{
 								flexDirection: `row`,
+							}}
+						>
+							<TextInput
+								placeholder="Ex: Mother's Day"
+								style={{ height: 50, flex: 3 }}
+								onChangeText={(text) => onTagChange(text)}
+								value={tag}
+							/>
+							<View style={{ flex: 1, justifyContent: `center` }}>
+								<TouchableOpacity onPress={handleCreateTag}>
+									<AntDesign name='plus' size={24} color='blue' />
+								</TouchableOpacity>
+							</View>
+						</View>
+
+						<View
+							style={{
+								flexDirection: `row`,
 								alignItems: `center`,
-								backgroundColor: `lightgreen`,
 								height: 50,
 								width: `100%`,
 							}}
@@ -199,23 +216,9 @@ const NewShiftForm = () => {
 								tags.map((tag) => <ShiftTag key={tag} text={tag} />)}
 						</View>
 
-						<View style={{ flexDirection: `row` }}>
-							<TextInput
-								placeholder="Ex: Mother's Day"
-								style={{ height: 50, flex: 3 }}
-								onChangeText={(text) => onTagChange(text)}
-								value={tag}
-							/>
-							<View style={{ flex: 1 }}>
-								<TouchableOpacity onPress={handleCreateTag}>
-									<AntDesign name='plus' size={32} color='blue' />
-								</TouchableOpacity>
-							</View>
-						</View>
-
 						{/* Conditionally render error message */}
 						{tagError !== '' && (
-							<Text style={{ backgroundColor: `red` }}>{tagError}</Text>
+							<Text style={{ color: `red` }}>{tagError}</Text>
 						)}
 
 						{/* Submit Data to database button */}
@@ -223,7 +226,7 @@ const NewShiftForm = () => {
 							<Button onPress={handleSubmit} title='Create Shift' />
 						</View>
 						{formError !== '' && (
-							<Text style={{ backgroundColor: `red` }}>{formError}</Text>
+							<Text style={{ color: `red` }}>{formError}</Text>
 						)}
 					</View>
 				</View>
@@ -257,6 +260,9 @@ const styles = StyleSheet.create({
 	subtitleText: {
 		fontSize: 16,
 		fontWeight: `bold`,
+		paddingBottom: 5,
+		borderBottomWidth: 0.5,
+		borderBottomColor: 'lightgrey',
 	},
 });
 
