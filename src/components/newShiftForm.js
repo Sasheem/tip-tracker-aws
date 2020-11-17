@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+	Platform,
 	View,
 	StyleSheet,
 	Keyboard,
@@ -8,7 +9,6 @@ import {
 	TextInput,
 	Button,
 	TouchableOpacity,
-	Alert,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
@@ -24,7 +24,7 @@ import ShiftTag from './shiftTag';
 
 const NewShiftForm = () => {
 	const [id, setId] = useState('');
-	const [date, setDate] = useState('');
+	const [date, setDate] = useState(moment().format('L'));
 	const [earnings, setEarnings] = useState('');
 	const [inTime, setInTime] = useState('');
 	const [outTime, setOutTime] = useState('');
@@ -50,6 +50,14 @@ const NewShiftForm = () => {
 	const showOutTimePicker = () => setOutTimePickerVisibility(true);
 	const hideInTimePicker = () => setInTimePickerVisibility(false);
 	const hideOutTimePicker = () => setOutTimePickerVisibility(false);
+
+	// handle date back arrow pressed
+	const handleDateBackward = () =>
+		setDate(moment(date, 'L').subtract(1, 'day').format('L'));
+
+	// handle date forward arrow pressed
+	const handleDateForward = () =>
+		setDate(moment(date, 'L').add(1, 'day').format('L'));
 
 	// handle in time confirmed
 	const handleInTimeConfirm = (date) => {
@@ -120,11 +128,23 @@ const NewShiftForm = () => {
 							flexDirection: `row`,
 							justifyContent: `space-evenly`,
 							alignItems: `center`,
+							marginTop: 20,
+							marginBottom: 20,
 						}}
 					>
-						<AntDesign name='left' size={24} color='black' />
-						<Text>{moment().format('L')}</Text>
-						<AntDesign name='right' size={24} color='black' />
+						<AntDesign
+							name='left'
+							size={28}
+							color='black'
+							onPress={handleDateBackward}
+						/>
+						<Text style={{ fontSize: 24 }}>{date}</Text>
+						<AntDesign
+							name='right'
+							size={28}
+							color='black'
+							onPress={handleDateForward}
+						/>
 					</View>
 
 					{/* Form Row: Earnings + Job */}
@@ -135,16 +155,20 @@ const NewShiftForm = () => {
 								placeholder='$0.00'
 								// autoFocus={true}
 								keyboardType='decimal-pad'
-								style={{ height: 50, width: 150 }}
+								style={
+									Platform.OS === 'ios'
+										? styles.earningsIOS
+										: styles.earningsAndroid
+								}
 								onChangeText={(text) => onEarningsChange(text)}
 								value={earnings}
 							/>
 						</View>
 						<View style={styles.rowComponent}>
-							<Text style={styles.subtitleText}>Select a job</Text>
+							<Text style={styles.subtitleText}>Select position</Text>
 							<Picker
 								selectedValue={job}
-								style={{ height: 50 }}
+								style={Platform.OS === 'ios' ? {} : { height: 50 }}
 								onValueChange={(itemValue, itemIndex) => setJob(itemValue)}
 							>
 								<Picker.Item label='Pick a job' value='default' />
@@ -158,9 +182,13 @@ const NewShiftForm = () => {
 					{/* Form Row: In Time + Out Time */}
 					<View style={{ flexDirection: `row` }}>
 						<View style={styles.rowComponent}>
-							<Text style={styles.subtitleText}>Enter In-Time</Text>
-							<Button title='Select In Time' onPress={showInTimePicker} />
-							{inTime !== '' && <Text>{moment(inTime).format('hh:mm a')}</Text>}
+							<Text style={styles.subtitleText}>Clocked in</Text>
+							<Button
+								title={
+									inTime !== '' ? moment(inTime).format('hh:mm a') : 'In Time'
+								}
+								onPress={showInTimePicker}
+							/>
 							<DateTimePickerModal
 								isVisible={isInTimePickerVisible}
 								mode='time'
@@ -168,12 +196,17 @@ const NewShiftForm = () => {
 								onCancel={hideInTimePicker}
 							/>
 						</View>
+						<View style={styles.rowFiller} />
 						<View style={styles.rowComponent}>
-							<Text style={styles.subtitleText}>Enter Out-Time</Text>
-							<Button title='Select Out Time' onPress={showOutTimePicker} />
-							{outTime !== '' && (
-								<Text>{moment(outTime).format('hh:mm a')}</Text>
-							)}
+							<Text style={styles.subtitleText}>Clocked out</Text>
+							<Button
+								title={
+									outTime !== ''
+										? moment(outTime).format('hh:mm a')
+										: 'Out Time'
+								}
+								onPress={showOutTimePicker}
+							/>
 							<DateTimePickerModal
 								isVisible={isOutTimePickerVisible}
 								mode='time'
@@ -184,7 +217,11 @@ const NewShiftForm = () => {
 					</View>
 
 					{/* Form Row: Shift Tags */}
-					<View style={{ justifyContent: `space-evenly` }}>
+					<View
+						style={{
+							justifyContent: `space-evenly`,
+						}}
+					>
 						<Text style={styles.subtitleText}>Add Shift Tags</Text>
 						<View
 							style={{
@@ -216,19 +253,29 @@ const NewShiftForm = () => {
 								tags.map((tag) => <ShiftTag key={tag} text={tag} />)}
 						</View>
 
-						{/* Conditionally render error message */}
+						{/* Conditionally render tag error message */}
 						{tagError !== '' && (
 							<Text style={{ color: `red` }}>{tagError}</Text>
 						)}
-
-						{/* Submit Data to database button */}
-						<View>
-							<Button onPress={handleSubmit} title='Create Shift' />
-						</View>
-						{formError !== '' && (
-							<Text style={{ color: `red` }}>{formError}</Text>
-						)}
 					</View>
+					{/* Submit Data to database button */}
+					<View>
+						<TouchableOpacity
+							onPress={handleSubmit}
+							style={{
+								zIndex: 3,
+								padding: 10,
+								backgroundColor: `lightblue`,
+								alignItems: `center`,
+								borderRadius: 2.5,
+							}}
+						>
+							<Text>Add</Text>
+						</TouchableOpacity>
+					</View>
+					{formError !== '' && (
+						<Text style={{ color: `red` }}>{formError}</Text>
+					)}
 				</View>
 
 				{/* Filler Component Margin Bottom */}
@@ -244,14 +291,19 @@ const styles = StyleSheet.create({
 		width: `80%`,
 		justifyContent: `center`,
 	},
+	earningsIOS: { fontSize: 34, width: 150 },
+	earningsAndroid: { height: 50, width: 150 },
 	formComponent: {
 		flex: 5,
 	},
 	rowComponent: {
 		flex: 1,
 	},
+	rowFiller: {
+		flex: 0.1,
+	},
 	filler: {
-		flex: 2,
+		flex: Platform.OS === 'android' ? 1 : 0.5,
 	},
 	titleText: {
 		fontSize: 24,
