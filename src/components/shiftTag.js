@@ -21,6 +21,7 @@ const ShiftTag = ({ text }) => {
 				paddingRight: 5,
 				borderRadius: 5,
 				height: 30,
+				marginRight: 10,
 			}}
 		>
 			<Text style={{ color: `rgba(139, 123, 119, 1)`, margin: 0, padding: 0 }}>
