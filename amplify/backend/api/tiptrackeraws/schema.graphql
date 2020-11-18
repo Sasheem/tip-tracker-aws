@@ -1,8 +1,42 @@
-type Shift @model {
+type Shift @model @auth(rules: [{ allow: owner }]) {
   id: ID!
-  date: String!
+  createdAt: String!
   amount: String
-  inTime: String!
-  outTime: String!
+  inTime: String
+  outTime: String
+  hours: String
   tags: [String]
+  user: User @connection(name: "UserShifts")
+}
+
+type Job @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  jobTitle: String!
+  jobWage: Float!
+  storeName: String
+  storeAddress: JobAddress
+  user: User @connection(name: "UserJobs")
+}
+
+type User
+	@model(
+		queries: { get: "getUser" }
+		mutations: { create: "registerUser", update: "updateUser" }
+		subscriptions: null
+	)
+	@auth(rules: [{ allow: owner }]) {
+	id: ID!
+	username: String!
+	email: String!
+	verified: Boolean
+	shifts: [Shift] @connection(name: "UserShifts", sortField: "createdAt")
+	jobs: [Job] @connection(name: "UserJobs")
+}
+
+type JobAddress {
+  city: String!
+  country: String!
+  address_line1: String!
+  address_state: String!
+  address_zip: String!
 }

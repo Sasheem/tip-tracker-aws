@@ -10,6 +10,11 @@
       "StackName": "amplify-tiptrackeraws-dev-142202",
       "StackId": "arn:aws:cloudformation:us-east-1:715108896523:stack/amplify-tiptrackeraws-dev-142202/303e4a80-1f9c-11eb-a296-0abd9caf10fb",
       "AmplifyAppId": "d2e4hc3iunrlnv"
+    },
+    "categories": {
+      "auth": {
+        "tiptrackerawsff79f1e0": {}
+      }
     }
   }
 }
