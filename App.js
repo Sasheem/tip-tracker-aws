@@ -5,7 +5,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Amplify from 'aws-amplify';
 import config from './aws-exports';
-Amplify.configure(config);
+import { withAuthenticator } from 'aws-amplify-react-native';
+
+// not using Analytics but prior to disabling it was causing a warning
+Amplify.configure({
+	...config,
+	Analytics: {
+		disabled: true,
+	},
+});
 
 import CreateShift from './src/screens/createShift';
 import ViewCalendar from './src/screens/viewCalendar';
@@ -14,7 +22,7 @@ import ViewMetrics from './src/screens/viewMetrics';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-export default function App() {
+const App = () => {
 	return (
 		<NavigationContainer>
 			<Tab.Navigator>
@@ -24,4 +32,6 @@ export default function App() {
 			</Tab.Navigator>
 		</NavigationContainer>
 	);
-}
+};
+
+export default withAuthenticator(App, { includeGreetings: true });
