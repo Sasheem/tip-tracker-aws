@@ -111,6 +111,7 @@ export const createJob = /* GraphQL */ `
         city
         country
         address_line1
+        address_line2
         address_state
         address_zip
       }
@@ -148,6 +149,7 @@ export const updateJob = /* GraphQL */ `
         city
         country
         address_line1
+        address_line2
         address_state
         address_zip
       }
@@ -185,6 +187,7 @@ export const deleteJob = /* GraphQL */ `
         city
         country
         address_line1
+        address_line2
         address_state
         address_zip
       }

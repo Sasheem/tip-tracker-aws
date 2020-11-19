@@ -71,6 +71,7 @@ export const getJob = /* GraphQL */ `
         city
         country
         address_line1
+        address_line2
         address_state
         address_zip
       }
@@ -110,6 +111,7 @@ export const listJobs = /* GraphQL */ `
           city
           country
           address_line1
+          address_line2
           address_state
           address_zip
         }

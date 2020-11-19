@@ -37,6 +37,7 @@ type JobAddress {
   city: String!
   country: String!
   address_line1: String!
+  address_line2: String
   address_state: String!
   address_zip: String!
 }
