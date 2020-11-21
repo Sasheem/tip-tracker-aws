@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+	StyleSheet,
+	Text,
+	View,
+	ActivityIndicator,
+	TouchableOpacity,
+} from 'react-native';
 import { API, graphqlOperation } from 'aws-amplify';
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
-import { AntDesign } from '@expo/vector-icons';
 
 import { listShifts } from '../graphql/queries';
-
+import CalendarDetail from '../components/calendarDetail';
 /**
  * todo Fix app so shift data shows up when you switch to the tab
  * 		? currently I need to navigate to another month and back
@@ -15,11 +20,13 @@ import { listShifts } from '../graphql/queries';
 
 const ViewCalendar = () => {
 	const [shifts, setShifts] = useState([]);
+	const [currentDetail, setCurrentDetail] = useState({});
 
 	// fetch shifts when component mounts and shifts state updates
 	useEffect(() => {
+		console.log(`fetching shifts`);
 		getShifts();
-	}, [shifts]);
+	}, []);
 
 	// helper function - fetch shifts
 	const getShifts = async () => {
@@ -49,10 +56,30 @@ const ViewCalendar = () => {
 				}
 			});
 			hourly = amount / hours;
-		}
 
-		console.log(`RESULT FOR ${date.dateString} =>`);
-		console.log(results);
+			return (
+				<View>
+					<TouchableOpacity onPress={() => setCurrentDetail({ ...results })}>
+						<Text
+							style={{
+								textAlign: 'center',
+								color: state === 'disabled' ? 'gray' : 'black',
+							}}
+						>
+							{date.day}
+						</Text>
+						{amount !== 0.0 && (
+							<Text style={{ textAlign: `center` }}>${amount.toFixed(0)}</Text>
+						)}
+						{amount !== 0.0 && hours !== 0.0 && (
+							<Text style={{ textAlign: `center` }}>
+								{hourly.toFixed(1)}/hr
+							</Text>
+						)}
+					</TouchableOpacity>
+				</View>
+			);
+		}
 
 		return (
 			<View>
@@ -64,12 +91,6 @@ const ViewCalendar = () => {
 				>
 					{date.day}
 				</Text>
-				{amount !== 0.0 && (
-					<Text style={{ textAlign: `center` }}>${amount.toFixed(0)}</Text>
-				)}
-				{amount !== 0.0 && hours !== 0.0 && (
-					<Text style={{ textAlign: `center` }}>{hourly.toFixed(1)}/hr</Text>
-				)}
 			</View>
 		);
 	};
@@ -77,33 +98,24 @@ const ViewCalendar = () => {
 	return (
 		<View style={styles.container}>
 			{/* Calendar Component */}
-			<Calendar
-				showWeekNumbers
-				hideExtraDays
-				firstDay={1}
-				style={{}}
-				dayComponent={({ date, state }) => {
-					return renderDayComponent(date, state);
-				}}
-			/>
+			{shifts.length !== 0 ? (
+				<Calendar
+					showWeekNumbers
+					hideExtraDays
+					firstDay={1}
+					style={{}}
+					dayComponent={({ date, state }) => {
+						return renderDayComponent(date, state);
+					}}
+				/>
+			) : (
+				<View style={[styles.activityContainer, styles.activityHorizontal]}>
+					<ActivityIndicator size='large' color='#00ff00' />
+				</View>
+			)}
 
 			{/* Calendar Detail */}
-			<View style={styles.detailerContainer}>
-				<View style={styles.header}></View>
-				<View style={styles.body}>
-					<View style={styles.nav}>
-						<AntDesign name='left' size={28} color='black' />
-					</View>
-					<View style={styles.content}>
-						<View style={styles.topRow}>{/* Earnings, Hours, Hourly */}</View>
-
-						<View style={styles.bottomRow}>{/* Position, Tags */}</View>
-					</View>
-					<View style={styles.nav}>
-						<AntDesign name='right' size={28} color='black' />
-					</View>
-				</View>
-			</View>
+			<CalendarDetail currentDetail={currentDetail} />
 		</View>
 	);
 };
@@ -114,28 +126,15 @@ const styles = StyleSheet.create({
 		height: `100%`,
 		width: `100%`,
 	},
-	detailerContainer: {
-		backgroundColor: `pink`,
+	activityContainer: {
 		flex: 1,
+		justifyContent: `center`,
 	},
-	header: {
-		flex: 0.5,
-		backgroundColor: `lightgreen`,
+	activityHorizontal: {
+		flexDirection: 'row',
+		justifyContent: 'space-around',
+		padding: 10,
 	},
-	body: {
-		flexDirection: `row`,
-		flex: 2,
-		backgroundColor: `lightblue`,
-	},
-	content: {
-		flex: 1,
-		backgroundColor: `purple`,
-	},
-	nav: {
-		flex: 0.25,
-	},
-	topRow: {},
-	bottomRow: {},
 });
 
 export default ViewCalendar;
