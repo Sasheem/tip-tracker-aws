@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
+import { Button, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -18,8 +19,42 @@ Amplify.configure({
 import CreateShift from './src/screens/createShift';
 import ViewCalendar from './src/screens/viewCalendar';
 import ViewMetrics from './src/screens/viewMetrics';
+import ViewSettings from './src/screens/viewSettings';
+import Profile from './src/components/settingsProfile';
+import Jobs from './src/components/settingsJobs';
+import CreateJob from './src/components/createJob';
 
-const Stack = createStackNavigator();
+const RootStack = createStackNavigator();
+
+const RootJobsScreen = ({ navigation }) => {
+	return (
+		<RootStack.Navigator mode='modal'>
+			<RootStack.Screen
+				name='CurrentJobs'
+				component={Jobs}
+				options={{ headerShown: false }}
+			/>
+			<RootStack.Screen
+				name='CreateJobModal'
+				component={CreateJob}
+				options={{ headerShown: false }}
+			/>
+		</RootStack.Navigator>
+	);
+};
+
+const SettingsStack = createStackNavigator();
+
+const SettingsStackScreen = ({ navigation }) => {
+	return (
+		<SettingsStack.Navigator>
+			<SettingsStack.Screen name='Settings' component={ViewSettings} />
+			<SettingsStack.Screen name='Profile' component={Profile} />
+			<SettingsStack.Screen name='Jobs' component={RootJobsScreen} />
+		</SettingsStack.Navigator>
+	);
+};
+
 const Tab = createBottomTabNavigator();
 
 const App = () => {
@@ -29,6 +64,7 @@ const App = () => {
 				<Tab.Screen name='Shift' component={CreateShift} />
 				<Tab.Screen name='Calendar' component={ViewCalendar} />
 				<Tab.Screen name='Metrics' component={ViewMetrics} />
+				<Tab.Screen name='Settings' component={SettingsStackScreen} />
 			</Tab.Navigator>
 		</NavigationContainer>
 	);
