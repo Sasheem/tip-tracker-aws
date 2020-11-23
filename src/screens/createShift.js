@@ -178,7 +178,7 @@ const CreateShift = () => {
 				<ScrollView>
 					<View style={styles.inner}>
 						{/* Title */}
-						<Text style={styles.header}>Add shift</Text>
+						<Text style={styles.title}>Add shift</Text>
 
 						{/* Date */}
 						<View
@@ -377,6 +377,7 @@ const CreateShift = () => {
 						{/* <View style={styles.btnContainer}>
 							<Button title='Submit' onPress={() => null} />
 						</View> */}
+						<View style={styles.hardFiller} />
 					</View>
 				</ScrollView>
 			</TouchableWithoutFeedback>
@@ -385,6 +386,9 @@ const CreateShift = () => {
 };
 
 const styles = StyleSheet.create({
+	hardFiller: {
+		height: 100,
+	},
 	container: {
 		flex: 1,
 	},
@@ -393,7 +397,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: `space-evenly`,
 	},
-	header: {
+	title: {
 		fontSize: 36,
 		marginBottom: 24,
 	},
