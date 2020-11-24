@@ -15,15 +15,18 @@ const CalendarDetail = ({ currentDetail, jobs }) => {
 						currentDetail[Object.keys(currentDetail)[0]].createdAt}
 				</Text>
 			</View>
-			<Swiper>
+			<Swiper showsButtons={true}>
 				{_.map(shifts, (item) => {
 					const { id, amount, hours, tags, job } = item[1];
 					var jobResult = null;
+
+					// calculate the hourly if it exists
 					var hourly =
 						(amount !== null) & (hours !== null)
 							? parseFloat(amount) / parseFloat(hours)
 							: 0.0;
 
+					// match job id to get job data
 					if (job !== null) {
 						jobResult = _.find(jobs, (jobItem) => jobItem.id === job);
 					}
@@ -33,7 +36,13 @@ const CalendarDetail = ({ currentDetail, jobs }) => {
 							<View style={styles.topRow}>
 								<View>
 									<Text>Amount</Text>
-									<Text>{amount !== null && amount}</Text>
+									<Text>
+										$
+										{jobResult !== null && jobResult.jobWage > 5.54
+											? jobResult.jobWage * parseFloat(hours)
+											: amount}
+									</Text>
+									{/* <Text>${amount !== null && amount}</Text> */}
 								</View>
 								<View>
 									<Text>Hours</Text>
@@ -41,7 +50,12 @@ const CalendarDetail = ({ currentDetail, jobs }) => {
 								</View>
 								<View>
 									<Text>Hourly</Text>
-									<Text>{hourly.toFixed(2)}</Text>
+									<Text>
+										{jobResult !== null && jobResult.jobWage > 5.54
+											? jobResult.jobWage
+											: hourly.toFixed(2)}{' '}
+										/hr
+									</Text>
 								</View>
 							</View>
 							<View style={styles.bottomRow}>
