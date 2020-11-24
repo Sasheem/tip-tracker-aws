@@ -11,6 +11,7 @@ export const getShift = /* GraphQL */ `
       outTime
       hours
       tags
+      job
       user {
         id
         username
@@ -45,6 +46,7 @@ export const listShifts = /* GraphQL */ `
         outTime
         hours
         tags
+        job
         user {
           id
           username
@@ -147,6 +149,7 @@ export const getUser = /* GraphQL */ `
           outTime
           hours
           tags
+          job
           updatedAt
           owner
         }

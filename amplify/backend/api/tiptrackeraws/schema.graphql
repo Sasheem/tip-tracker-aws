@@ -6,6 +6,7 @@ type Shift @model @auth(rules: [{ allow: owner }]) {
   outTime: String
   hours: String
   tags: [String]
+  job: String
   user: User @connection(name: "UserShifts")
 }
 

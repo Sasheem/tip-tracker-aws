@@ -14,6 +14,7 @@ export const createShift = /* GraphQL */ `
       outTime
       hours
       tags
+      job
       user {
         id
         username
@@ -46,6 +47,7 @@ export const updateShift = /* GraphQL */ `
       outTime
       hours
       tags
+      job
       user {
         id
         username
@@ -78,6 +80,7 @@ export const deleteShift = /* GraphQL */ `
       outTime
       hours
       tags
+      job
       user {
         id
         username
@@ -230,6 +233,7 @@ export const registerUser = /* GraphQL */ `
           outTime
           hours
           tags
+          job
           updatedAt
           owner
         }
@@ -271,6 +275,7 @@ export const updateUser = /* GraphQL */ `
           outTime
           hours
           tags
+          job
           updatedAt
           owner
         }
