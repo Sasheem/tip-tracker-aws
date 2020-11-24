@@ -10,25 +10,29 @@ import {
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
+import { API, graphqlOperation } from 'aws-amplify';
+
+import { createJob } from '../graphql/mutations';
 
 /**
  *
  * @param {navigation} param0
  * ? object to handle navigation
  *
- * todo add error checking to handleSubmit
- * todo make api call to add form add as job
+ * todo add error checking to handleSubmit DONE
+ * todo make api call to add form add as job DONE
  * todo combine similar form styling into separate file - POST LAUNCH PRIORITY
  * ? see createShift component for similar styling
+ * todo add a subscription to update jobs array
  */
 
 const CreateJob = ({ navigation }) => {
 	const [jobTitle, setJobTitle] = useState('');
 	const [jobWage, setJobWage] = useState('');
-	const [jobName, setJobName] = useState('');
-	const [jobAddress, setJobAddress] = useState({
+	const [storeName, setStoreName] = useState('');
+	const [storeAddress, setStoreAddress] = useState({
 		city: '',
-		country: '',
+		country: 'USA',
 		address_line1: '',
 		address_line2: '',
 		address_state: '',
@@ -48,19 +52,66 @@ const CreateJob = ({ navigation }) => {
 
 	const onNameChange = (text) => {
 		setFormError('');
-		setJobName(text);
+		setStoreName(text);
 	};
 
 	const onAddressChange = (event, name) => {
-		setJobAddress({ ...jobAddress, [name]: event.nativeEvent.text });
+		setStoreAddress({ ...storeAddress, [name]: event.nativeEvent.text });
 	};
 
 	const handleSubmit = () => {
-		console.log(
-			`save button pressed with state: ${jobTitle} - ${jobWage} - ${jobName} - ${JSON.stringify(
-				jobAddress
-			)}`
-		);
+		const { city, address_line1, address_state, address_zip } = storeAddress;
+
+		// job title and wage are both required
+		if (jobTitle === '') {
+			return setFormError('Fill in job title');
+		}
+		if (jobWage === '') {
+			return setFormError('Fill in hourly wage');
+		} else if (parseFloat(jobWage) > 30) {
+			return setFormError('Wage is too high');
+		}
+
+		// if line one is provided, check all other fields
+		if (address_line1 !== '') {
+			if (address_line1 === '') {
+				return setFormError('Fill in Address Line 1');
+			}
+			if (address_state === '') {
+				return setFormError('Fill in State');
+			}
+			if (address_zip === '') {
+				return setFormError('Fill in Zip Code');
+			}
+			if (city === '') {
+				return setFormError('Fill in City');
+			}
+		}
+
+		// prepare data
+		const input = {
+			jobTitle,
+			jobWage: parseFloat(jobWage),
+			storeName,
+			storeAddress,
+		};
+
+		// write to backend
+		API.graphql(graphqlOperation(createJob, { input }));
+		setJobTitle('');
+		setJobWage('');
+		setStoreName('');
+		setStoreAddress({
+			city: '',
+			country: 'USA',
+			address_line1: '',
+			address_line2: '',
+			address_state: '',
+			address_zip: '',
+		});
+
+		// navigate back to parent screen
+		navigation.navigate('CurrentJobs');
 	};
 
 	return (
@@ -109,7 +160,7 @@ const CreateJob = ({ navigation }) => {
 									style={styles.textInput}
 									placeholder='Outback, Carrabas, etc.'
 									onChangeText={(text) => onNameChange(text)}
-									value={jobName}
+									value={storeName}
 								/>
 							</View>
 
@@ -119,32 +170,32 @@ const CreateJob = ({ navigation }) => {
 									style={styles.textInput}
 									placeholder='Address Line 1'
 									onChange={(event) => onAddressChange(event, 'address_line1')}
-									value={jobAddress.address_line1}
+									value={storeAddress.address_line1}
 								/>
 								<TextInput
 									style={styles.textInput}
 									placeholder='Address Line 2'
 									onChange={(event) => onAddressChange(event, 'address_line2')}
-									value={jobAddress.address_line2}
+									value={storeAddress.address_line2}
 								/>
 								<TextInput
 									style={styles.textInput}
 									placeholder='City'
 									onChange={(event) => onAddressChange(event, 'city')}
-									value={jobAddress.city}
+									value={storeAddress.city}
 								/>
 								<TextInput
 									style={styles.textInput}
 									placeholder='Zip Code'
 									keyboardType='number-pad'
 									onChange={(event) => onAddressChange(event, 'address_zip')}
-									value={jobAddress.address_zip}
+									value={storeAddress.address_zip}
 								/>
 								<TextInput
 									style={styles.textInput}
 									placeholder='State'
 									onChange={(event) => onAddressChange(event, 'address_state')}
-									value={jobAddress.address_state}
+									value={storeAddress.address_state}
 								/>
 							</View>
 							<View style={styles.btnContainer}>
