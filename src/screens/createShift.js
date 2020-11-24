@@ -167,6 +167,7 @@ const CreateShift = () => {
 			inTime,
 			outTime,
 			hours: duration !== '' ? duration : hours,
+			job,
 			tags,
 		};
 
