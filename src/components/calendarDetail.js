@@ -4,7 +4,7 @@ import { AntDesign } from '@expo/vector-icons';
 import Swiper from 'react-native-swiper';
 import _ from 'lodash';
 
-const CalendarDetail = ({ currentDetail }) => {
+const CalendarDetail = ({ currentDetail, jobs }) => {
 	const shifts = Object.entries(currentDetail);
 
 	return (
@@ -16,14 +16,17 @@ const CalendarDetail = ({ currentDetail }) => {
 				</Text>
 			</View>
 			<Swiper>
-				{shifts.map((item) => {
-					const { id, amount, hours, tags } = item[1];
-
-					console.log(`amount: ${amount}`);
+				{_.map(shifts, (item) => {
+					const { id, amount, hours, tags, job } = item[1];
+					var jobResult = null;
 					var hourly =
 						(amount !== null) & (hours !== null)
 							? parseFloat(amount) / parseFloat(hours)
 							: 0.0;
+
+					if (job !== null) {
+						jobResult = _.find(jobs, (jobItem) => jobItem.id === job);
+					}
 
 					return (
 						<View key={id} style={styles.content}>
@@ -44,7 +47,7 @@ const CalendarDetail = ({ currentDetail }) => {
 							<View style={styles.bottomRow}>
 								<View>
 									<Text>Job</Text>
-									<Text>jobTitle</Text>
+									<Text>{jobResult !== null && jobResult.jobTitle}</Text>
 								</View>
 								<View>
 									<Text>Tags</Text>

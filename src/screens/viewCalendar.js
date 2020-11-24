@@ -9,8 +9,9 @@ import {
 import { API, graphqlOperation } from 'aws-amplify';
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
+import _ from 'lodash';
 
-import { listShifts } from '../graphql/queries';
+import { listShifts, listJobs } from '../graphql/queries';
 import CalendarDetail from '../components/calendarDetail';
 /**
  * todo Fix app so shift data shows up when you switch to the tab
@@ -20,18 +21,27 @@ import CalendarDetail from '../components/calendarDetail';
 
 const ViewCalendar = () => {
 	const [shifts, setShifts] = useState([]);
+	const [jobs, setJobs] = useState([]);
 	const [currentDetail, setCurrentDetail] = useState({});
 
 	// fetch shifts when component mounts and shifts state updates
 	useEffect(() => {
 		console.log(`fetching shifts`);
 		getShifts();
+		console.log(`fetching jobs`);
+		getJobs();
 	}, []);
 
 	// helper function - fetch shifts
 	const getShifts = async () => {
 		const result = await API.graphql(graphqlOperation(listShifts));
 		setShifts(result.data.listShifts.items);
+	};
+
+	// helper function - fetch jobs
+	const getJobs = async () => {
+		const result = await API.graphql(graphqlOperation(listJobs));
+		setJobs(result.data.listJobs.items);
 	};
 
 	// renderDayComponent - find all shifts for each day and render amount + hourly
@@ -47,7 +57,7 @@ const ViewCalendar = () => {
 		);
 
 		if (results.length !== 0) {
-			results.map((item) => {
+			_.map(results, (item) => {
 				if (item.amount !== '') {
 					amount += parseFloat(item.amount);
 				}
@@ -115,7 +125,7 @@ const ViewCalendar = () => {
 			)}
 
 			{/* Calendar Detail */}
-			<CalendarDetail currentDetail={currentDetail} />
+			<CalendarDetail currentDetail={currentDetail} jobs={jobs} />
 		</View>
 	);
 };
