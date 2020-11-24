@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+	Platform,
 	StyleSheet,
 	View,
 	Text,
@@ -217,7 +218,7 @@ const CreateJob = ({ navigation }) => {
 
 const styles = StyleSheet.create({
 	hardFiller: {
-		height: 200,
+		height: Platform.OS === 'ios' ? 300 : 200,
 	},
 	container: {
 		flex: 1,
