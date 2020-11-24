@@ -14,13 +14,14 @@ import {
 	SafeAreaView,
 	ScrollView,
 } from 'react-native';
-import Constants from 'expo-constants';
 import { API, graphqlOperation } from 'aws-amplify';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
+import _ from 'lodash';
 import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { createShift } from '../graphql/mutations';
+import { listJobs } from '../graphql/queries';
 
 import ShiftTag from '../components/shiftTag';
 
@@ -33,8 +34,8 @@ import ShiftTag from '../components/shiftTag';
  * 		? if they do, prompt user to edit shift instead or change times
  * todo add button for user to clear all form data
  * todo fix scrollView so it actually scrolls DONE
- * todo focus screen on tag input whenever user focuses on input
- * 		? KeyboardAvoidingView
+ * todo focus screen on tag input whenever user focuses on input DONE
+ * todo add a subscription to update jobs array
  */
 
 const CreateShift = () => {
@@ -46,12 +47,19 @@ const CreateShift = () => {
 	const [hours, setHours] = useState('');
 	const [hoursToggled, setHoursToggled] = useState(false);
 	const [job, setJob] = useState('default');
+	const [jobs, setJobs] = useState([]);
 	const [tag, setTag] = useState('');
 	const [tags, setTags] = useState([]);
 	const [isInTimePickerVisible, setInTimePickerVisibility] = useState(false);
 	const [isOutTimePickerVisible, setOutTimePickerVisibility] = useState(false);
 	const [tagError, setTagError] = useState('');
 	const [formError, setFormError] = useState('');
+
+	// when component mounts fetch jobs
+	useEffect(() => {
+		console.log(`fetching jobs`);
+		getJobs();
+	}, []);
 
 	// helper functions
 	const onAmountChange = (text) => {
@@ -74,6 +82,12 @@ const CreateShift = () => {
 	const showOutTimePicker = () => setOutTimePickerVisibility(true);
 	const hideInTimePicker = () => setInTimePickerVisibility(false);
 	const hideOutTimePicker = () => setOutTimePickerVisibility(false);
+
+	// fetch jobs
+	const getJobs = async () => {
+		const result = await API.graphql(graphqlOperation(listJobs));
+		setJobs(result.data.listJobs.items);
+	};
 
 	// handle date back arrow pressed
 	const handleDateBackward = () =>
@@ -235,10 +249,14 @@ const CreateShift = () => {
 										onJobChange(itemValue)
 									}
 								>
-									<Picker.Item label='Pick a job' value='default' />
-									<Picker.Item label='Server' value='server' />
-									<Picker.Item label='Bartender' value='bar' />
-									<Picker.Item label='Key' value='key' />
+									<Picker.Item label='Pick job' value='default' />
+									{_.map(jobs, (job) => (
+										<Picker.Item
+											key={job.id}
+											label={job.jobTitle}
+											value={job.id}
+										/>
+									))}
 								</Picker>
 							</View>
 						</View>
