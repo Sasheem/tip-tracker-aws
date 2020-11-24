@@ -84,14 +84,12 @@ const CalendarDetail = ({ currentDetail, jobs }) => {
 const styles = StyleSheet.create({
 	wrapper: {},
 	detailerContainer: {
-		backgroundColor: `pink`,
 		flex: 1,
 	},
 	header: {
 		flex: 0.5,
 		justifyContent: `center`,
 		alignItems: `center`,
-		backgroundColor: `lightgreen`,
 	},
 	headerText: {
 		fontSize: 24,
