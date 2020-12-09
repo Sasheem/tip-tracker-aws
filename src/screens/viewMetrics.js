@@ -23,6 +23,10 @@ const ViewMetrics = () => {
 	const [weekly, setWeekly] = useState({});
 	const [monthly, setMonthly] = useState({});
 	const [yearly, setYearly] = useState({});
+	const [lifetime, setLifetime] = useState({});
+	const [topAmount, setTopAmount] = useState({});
+	const [topHours, setTopHours] = useState({});
+	const [topHourly, setTopHourly] = useState({});
 
 	// fetch shifts when component mounts and shifts state updates
 	useEffect(() => {
@@ -30,15 +34,61 @@ const ViewMetrics = () => {
 		getShifts();
 		console.log(`viewMetrics: fetching jobs`);
 		getJobs();
+	}, []);
+
+	// calculate lifetime metrics
+	useEffect(() => {
+		var lifetimeAmount = 0.0;
+		var lifetimeHours = 0.0;
+		var lifetimeHourly = 0.0;
+		var topAmount = 0.0;
+		var topHours = 0.0;
+		var topHourly = 0.0;
 
 		if (shifts.length !== 0) {
 			_.map(shifts, (shift) => {
-				// work your magic here and make some calculations
-				// might be best to separate the calculations into
-				// 4 separate algorithms
+				// calculate lifetime metrics
+				let amount = parseFloat(shift.amount);
+				let hours = parseFloat(shift.hours);
+				let hourly = amount / hours;
+
+				// find the most amount
+				if (topAmount < amount) {
+					topAmount = amount;
+					setTopAmount({ ...shift });
+				}
+
+				// find the most hours
+				if (topHours < hours) {
+					topHours = hours;
+					setTopHours({ ...shift });
+				}
+
+				// add amount if it exists, if not then its an hourly based job
+				if (shift.amount) {
+					lifetimeAmount += amount;
+
+					// calculate hourly and compare to current highest hourly
+					let tempHourly = amount / hours;
+					if (topHourly < tempHourly) {
+						topHourly = tempHourly;
+						setTopHourly({ ...shift, hourly: topHourly.toFixed(1) });
+					}
+				}
+
+				if (shift.hours) {
+					lifetimeHours += hours;
+				}
+			});
+
+			lifetimeHourly = lifetimeAmount / lifetimeHours;
+			setLifetime({
+				amount: lifetimeAmount.toFixed(2),
+				hours: lifetimeHours.toFixed(1),
+				hourly: lifetimeHourly.toFixed(1),
 			});
 		}
-	}, []);
+	}, [shifts]);
 
 	// helper function - fetch shifts
 	const getShifts = async () => {
@@ -52,6 +102,7 @@ const ViewMetrics = () => {
 		setJobs(result.data.listJobs.items);
 	};
 
+	console.log(`Top Amount: ${JSON.stringify(topAmount)}`);
 	return (
 		<View style={styles.container}>
 			{/* Top metrics */}
@@ -59,17 +110,41 @@ const ViewMetrics = () => {
 				{/* Top Row */}
 				<Text style={styles.title}>Top Metrics</Text>
 				<View style={styles.row}>
-					<MetricComponent title='Earnings' value='$320' date='11/2/20' />
-					<MetricComponent title='Hourly' value='42.5/hr' date='5/4/20' />
-					<MetricComponent title='Hours' value='11.5' date='9/2/20' />
+					<MetricComponent
+						title='Earnings'
+						value={`$${topAmount.amount}`}
+						date={`${topAmount.createdAt}`}
+					/>
+					<MetricComponent
+						title='Hourly'
+						value={`${topHourly.hourly} /hr`}
+						date={`${topHourly.createdAt}`}
+					/>
+					<MetricComponent
+						title='Hours'
+						value={`${topHours.hours}`}
+						date={`${topHours.createdAt}`}
+					/>
 				</View>
 
 				{/* Lifetime Row */}
 				<Text style={styles.title}>Lifetime Metrics</Text>
 				<View style={styles.row}>
-					<MetricComponent title='Earnings' value='$70205' date={null} />
-					<MetricComponent title='Hourly' value='18.6/hr' date={null} />
-					<MetricComponent title='Hours' value='3840' date={null} />
+					<MetricComponent
+						title='Earnings'
+						value={`$${lifetime.amount}`}
+						date={null}
+					/>
+					<MetricComponent
+						title='Hourly'
+						value={`${lifetime.hourly} /hr`}
+						date={null}
+					/>
+					<MetricComponent
+						title='Hours'
+						value={`${lifetime.hours} hrs`}
+						date={null}
+					/>
 				</View>
 			</View>
 

@@ -15,7 +15,10 @@ const styles = StyleSheet.create({
 	container: {},
 	title: {},
 	value: {},
-	date: {},
+	date: {
+		fontSize: 12,
+		color: `grey`,
+	},
 });
 
 export default MetricComponent;
