@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { API, graphqlOperation } from 'aws-amplify';
 import moment from 'moment';
 import _ from 'lodash';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import RNPickerSelect, { defaultStyles } from 'react-native-picker-select';
 
 import { listJobs, listShifts } from '../graphql/queries';
 
@@ -20,23 +22,47 @@ const ViewMetrics = () => {
 	const [shifts, setShifts] = useState([]);
 	const [jobs, setJobs] = useState([]);
 	const [daily, setDaily] = useState({});
+	const [dailyLabel, setDailyLabel] = useState(moment().format('MM-DD-YYYY'));
 	const [weekly, setWeekly] = useState({});
+	const [monthlyLabel, setMonthlyLabel] = useState(moment().format('MMMM'));
 	const [monthly, setMonthly] = useState({});
+	const [yearlyLabel, setYearlyLabel] = useState(moment().format('YYYY'));
 	const [yearly, setYearly] = useState({});
 	const [lifetime, setLifetime] = useState({});
 	const [topAmount, setTopAmount] = useState({});
 	const [topHours, setTopHours] = useState({});
 	const [topHourly, setTopHourly] = useState({});
+	const [dailyItems, setDailyItems] = useState([]);
 
 	// fetch shifts when component mounts and shifts state updates
 	useEffect(() => {
-		console.log(`viewMetrics: fetching shifts`);
 		getShifts();
-		console.log(`viewMetrics: fetching jobs`);
 		getJobs();
 	}, []);
 
-	// calculate lifetime metrics
+	// set up daily, weekly, monthly, and yearly arrays for RNPickerSelect
+	useEffect(() => {
+		var daily = [];
+		// var weekly = [];
+		// var monthly = [];
+		// var yearly = [];
+
+		if (shifts.length !== 0) {
+			const sortedShifts = _.sortBy(shifts, (shift) => shift.createdAt);
+			_.map(_.reverse(sortedShifts), (shift) => {
+				if (shift.amount) {
+					daily.push({
+						label: `${shift.createdAt}`,
+						value: `${shift.createdAt}`,
+					});
+				}
+			});
+		}
+
+		setDailyItems(daily);
+	}, [shifts]);
+
+	// calculate lifetime and top metrics
 	useEffect(() => {
 		var lifetimeAmount = 0.0;
 		var lifetimeHours = 0.0;
@@ -50,7 +76,6 @@ const ViewMetrics = () => {
 				// calculate lifetime metrics
 				let amount = parseFloat(shift.amount);
 				let hours = parseFloat(shift.hours);
-				let hourly = amount / hours;
 
 				// find the most amount
 				if (topAmount < amount) {
@@ -90,6 +115,58 @@ const ViewMetrics = () => {
 		}
 	}, [shifts]);
 
+	// filter metrics based on month with momentjs
+	useEffect(() => {
+		const results = _.filter(shifts, (shift) =>
+			moment(monthlyLabel, 'MMMM').isSame(shift.createdAt, 'month')
+		);
+		setMonthly(calculate(results));
+	}, [shifts, monthlyLabel]);
+
+	// filter metrics based on year with momentjs
+	useEffect(() => {
+		const results = _.filter(shifts, (shift) =>
+			moment(yearlyLabel, 'YYYY').isSame(shift.createdAt, 'year')
+		);
+		setYearly(calculate(results));
+	}, [shifts, yearlyLabel]);
+
+	// handle monthly date confirmed
+	const handleDailyConfirm = (value) => {
+		setDailyLabel(value);
+
+		const result = _.filter(shifts, (shift) =>
+			moment(value, 'MM-DD-YYYY').isSame(shift.createdAt, 'day')
+		);
+		setDaily({ ...result[0] });
+	};
+
+	// helper function - return calculated amount, hours, hourly in object
+	const calculate = (shifts) => {
+		var totalAmount = 0.0;
+		var totalHours = 0.0;
+		var totalHourly = 0.0;
+
+		_.map(shifts, (shift) => {
+			let amount = parseFloat(shift.amount);
+			let hours = parseFloat(shift.hours);
+
+			if (amount) {
+				totalAmount += amount;
+			}
+			if (hours) {
+				totalHours += hours;
+			}
+		});
+		totalHourly = totalAmount / totalHours;
+
+		return {
+			amount: totalAmount.toFixed(2),
+			hours: totalHours.toFixed(1),
+			hourly: totalHourly.toFixed(1),
+		};
+	};
+
 	// helper function - fetch shifts
 	const getShifts = async () => {
 		const result = await API.graphql(graphqlOperation(listShifts));
@@ -102,7 +179,23 @@ const ViewMetrics = () => {
 		setJobs(result.data.listJobs.items);
 	};
 
-	console.log(`Top Amount: ${JSON.stringify(topAmount)}`);
+	/**
+	 * todo construct this in useEffect based off shifts data
+	 */
+	// month values
+	const monthValues = [
+		{ label: 'November', value: 'November' },
+		{ label: 'December', value: 'December' },
+	];
+
+	// year values
+	const yearValues = [
+		{ label: '2021', value: '2021' },
+		{ label: '2020', value: '2020' },
+		{ label: '2019', value: '2019' },
+		{ label: '2018', value: '2018' },
+	];
+
 	return (
 		<View style={styles.container}>
 			{/* Top metrics */}
@@ -153,11 +246,21 @@ const ViewMetrics = () => {
 				<Text style={styles.title}>Summary</Text>
 				{/* Daily */}
 				<View style={styles.summaryBlock}>
-					<Text style={styles.summaryButton}>[Daily Button]</Text>
+					{/* <Text>{dailyLabel}</Text> */}
+					<RNPickerSelect
+						onValueChange={(value) => handleDailyConfirm(value)}
+						items={dailyItems}
+						value={dailyLabel}
+					/>
 					<View style={styles.row}>
-						<SummaryMetric title='Earnings' value='$180' />
-						<SummaryMetric title='Hourly' value='17.4 /hr' />
-						<SummaryMetric title='Hours' value='10.38 hrs' />
+						<SummaryMetric title='Earnings' value={`$${daily.amount}`} />
+						<SummaryMetric
+							title='Hourly'
+							value={` ${(
+								parseFloat(daily.amount) / parseFloat(daily.hours)
+							).toFixed(1)} /hr`}
+						/>
+						<SummaryMetric title='Hours' value={`${daily.hours} hrs`} />
 					</View>
 				</View>
 
@@ -173,21 +276,29 @@ const ViewMetrics = () => {
 
 				{/* Monthly */}
 				<View style={styles.summaryBlock}>
-					<Text style={styles.summaryButton}>[Monthly Button]</Text>
+					<RNPickerSelect
+						onValueChange={(value) => setMonthlyLabel(value)}
+						items={monthValues}
+						value={monthlyLabel}
+					/>
 					<View style={styles.row}>
-						<SummaryMetric title='Earnings' value='$2004' />
-						<SummaryMetric title='Hourly' value='17.74 /hr' />
-						<SummaryMetric title='Hours' value='112.92 hrs' />
+						<SummaryMetric title='Earnings' value={`$${monthly.amount}`} />
+						<SummaryMetric title='Hourly' value={`${monthly.hourly} /hr`} />
+						<SummaryMetric title='Hours' value={`${monthly.hours} hrs`} />
 					</View>
 				</View>
 
 				{/* Yearly */}
 				<View style={styles.summaryBlock}>
-					<Text style={styles.summaryButton}>[Year Button]</Text>
+					<RNPickerSelect
+						onValueChange={(value) => setYearlyLabel(value)}
+						items={yearValues}
+						value={yearlyLabel}
+					/>
 					<View style={styles.row}>
-						<SummaryMetric title='Earnings' value='$2004' />
-						<SummaryMetric title='Hourly' value='17.74 /hr' />
-						<SummaryMetric title='Hours' value='112.92 hrs' />
+						<SummaryMetric title='Earnings' value={`$${yearly.amount}`} />
+						<SummaryMetric title='Hourly' value={`${yearly.hourly} /hr`} />
+						<SummaryMetric title='Hours' value={`${yearly.hours} hrs`} />
 					</View>
 				</View>
 			</View>
