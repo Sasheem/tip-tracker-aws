@@ -21,8 +21,9 @@ import SummaryMetric from '../components/summaryMetric';
 const ViewMetrics = () => {
 	const [shifts, setShifts] = useState([]);
 	const [jobs, setJobs] = useState([]);
-	const [daily, setDaily] = useState({});
 	const [dailyLabel, setDailyLabel] = useState(moment().format('MM-DD-YYYY'));
+	const [daily, setDaily] = useState({});
+	const [weeklyLabel, setWeeklyLabel] = useState(moment().format('w'));
 	const [weekly, setWeekly] = useState({});
 	const [monthlyLabel, setMonthlyLabel] = useState(moment().format('MMMM'));
 	const [monthly, setMonthly] = useState({});
@@ -56,6 +57,13 @@ const ViewMetrics = () => {
 						value: `${shift.createdAt}`,
 					});
 				}
+			});
+
+			_.map(shifts, (shift) => {
+				/**
+				 * todo begin constructing the weekly array by reading every shift and adding the week to the array
+				 * * if it doesn't exist there already.
+				 */
 			});
 		}
 
@@ -115,6 +123,22 @@ const ViewMetrics = () => {
 		}
 	}, [shifts]);
 
+	// filter metrics based on day with momentjs
+	useEffect(() => {
+		const result = _.filter(shifts, (shift) =>
+			moment(dailyLabel, 'MM-DD-YYYY').isSame(shift.createdAt, 'day')
+		);
+		setDaily({ ...result[0] });
+	}, [shifts, dailyLabel]);
+
+	// filter metrics based on week with momentjs
+	useEffect(() => {
+		const results = _.filter(shifts, (shift) =>
+			moment(weeklyLabel, 'w').isSame(shift.createdAt, 'week')
+		);
+		setWeekly(calculate(results));
+	}, [shifts, weeklyLabel]);
+
 	// filter metrics based on month with momentjs
 	useEffect(() => {
 		const results = _.filter(shifts, (shift) =>
@@ -130,16 +154,6 @@ const ViewMetrics = () => {
 		);
 		setYearly(calculate(results));
 	}, [shifts, yearlyLabel]);
-
-	// handle monthly date confirmed
-	const handleDailyConfirm = (value) => {
-		setDailyLabel(value);
-
-		const result = _.filter(shifts, (shift) =>
-			moment(value, 'MM-DD-YYYY').isSame(shift.createdAt, 'day')
-		);
-		setDaily({ ...result[0] });
-	};
 
 	// helper function - return calculated amount, hours, hourly in object
 	const calculate = (shifts) => {
@@ -246,9 +260,9 @@ const ViewMetrics = () => {
 				<Text style={styles.title}>Summary</Text>
 				{/* Daily */}
 				<View style={styles.summaryBlock}>
-					{/* <Text>{dailyLabel}</Text> */}
+					<Text>{dailyLabel}</Text>
 					<RNPickerSelect
-						onValueChange={(value) => handleDailyConfirm(value)}
+						onValueChange={(value) => setDailyLabel(value)}
 						items={dailyItems}
 						value={dailyLabel}
 					/>
@@ -268,9 +282,9 @@ const ViewMetrics = () => {
 				<View style={styles.summaryBlock}>
 					<Text style={styles.summaryButton}>[Weekly Button]</Text>
 					<View style={styles.row}>
-						<SummaryMetric title='Earnings' value='$501' />
-						<SummaryMetric title='Hourly' value='17.74 /hr' />
-						<SummaryMetric title='Hours' value='28.23 hrs' />
+						<SummaryMetric title='Earnings' value={`$${weekly.amount}`} />
+						<SummaryMetric title='Hourly' value={`${weekly.hourly} /hr`} />
+						<SummaryMetric title='Hours' value={`${weekly.hours} hrs`} />
 					</View>
 				</View>
 
