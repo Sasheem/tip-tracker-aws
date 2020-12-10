@@ -36,6 +36,8 @@ import ShiftTag from '../components/shiftTag';
  * todo fix scrollView so it actually scrolls DONE
  * todo focus screen on tag input whenever user focuses on input DONE
  * todo add a subscription to update jobs array
+ * todo remove tag from state when its corresponding delete button is pressed
+ * todo replace Picker with RNPickerSelect
  */
 
 const CreateShift = () => {
@@ -193,7 +195,7 @@ const CreateShift = () => {
 				<ScrollView>
 					<View style={styles.inner}>
 						{/* Title */}
-						<Text style={styles.title}>Add shift</Text>
+						{/* <Text style={styles.title}>Add a shift</Text> */}
 
 						{/* Date */}
 						<View
@@ -417,8 +419,9 @@ const styles = StyleSheet.create({
 		justifyContent: `space-evenly`,
 	},
 	title: {
-		fontSize: 36,
+		fontSize: 32,
 		marginBottom: 24,
+		textAlign: `center`,
 	},
 	subtitle: {
 		fontSize: 16,
