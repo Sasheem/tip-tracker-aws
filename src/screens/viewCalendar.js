@@ -12,6 +12,7 @@ import moment from 'moment';
 import _ from 'lodash';
 
 import { listShifts, listJobs } from '../graphql/queries';
+import { onCreateShift } from '../graphql/subscriptions';
 import CalendarDetail from '../components/calendarDetail';
 /**
  * todo Fix app so shift data shows up when you switch to the tab
@@ -31,6 +32,24 @@ const ViewCalendar = () => {
 		console.log(`fetching jobs`);
 		getJobs();
 	}, []);
+
+	// useEffect(() => {
+	// 	const onCreateSubscription = API.graphql(
+	// 		graphqlOperation(onCreateShift)
+	// 	).subscribe({
+	// 		next: (shiftData) => {
+	// 			const newShift = shiftData.value.data.onCreateShift;
+	// 			const prevShifts = shifts.filter((shift) => shift.id !== newShift.id);
+	// 			setShifts([...prevShifts, newShift]);
+	// 		},
+	// 	});
+
+	// 	return () => {
+	// 		if (onCreateSubscription) {
+	// 			onCreateSubscription.unsubscribe();
+	// 		}
+	// 	};
+	// }, [shifts]);
 
 	// helper function - fetch shifts
 	const getShifts = async () => {
@@ -72,19 +91,17 @@ const ViewCalendar = () => {
 					<TouchableOpacity onPress={() => setCurrentDetail({ ...results })}>
 						<Text
 							style={{
-								textAlign: 'center',
+								textAlign: 'left',
 								color: state === 'disabled' ? 'gray' : 'black',
 							}}
 						>
 							{date.day}
 						</Text>
 						{amount !== 0.0 && (
-							<Text style={{ textAlign: `center` }}>${amount.toFixed(0)}</Text>
+							<Text style={styles.cellText}>${amount.toFixed(0)}</Text>
 						)}
 						{amount !== 0.0 && hours !== 0.0 && (
-							<Text style={{ textAlign: `center` }}>
-								{hourly.toFixed(1)}/hr
-							</Text>
+							<Text style={styles.cellText}>{hourly.toFixed(1)}/hr</Text>
 						)}
 					</TouchableOpacity>
 				</View>
@@ -95,7 +112,7 @@ const ViewCalendar = () => {
 			<View>
 				<Text
 					style={{
-						textAlign: 'center',
+						textAlign: 'left',
 						color: state === 'disabled' ? 'gray' : 'black',
 					}}
 				>
@@ -112,7 +129,6 @@ const ViewCalendar = () => {
 				<Calendar
 					showWeekNumbers
 					hideExtraDays
-					firstDay={1}
 					style={{}}
 					dayComponent={({ date, state }) => {
 						return renderDayComponent(date, state);
@@ -144,6 +160,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-around',
 		padding: 10,
+	},
+	cellText: {
+		fontSize: 11,
+		textAlign: `center`,
 	},
 });
 
