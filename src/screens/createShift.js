@@ -22,6 +22,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { createShift } from '../graphql/mutations';
 import { listJobs } from '../graphql/queries';
+import RNPickerSelect from 'react-native-picker-select';
 
 import ShiftTag from '../components/shiftTag';
 
@@ -38,6 +39,7 @@ import ShiftTag from '../components/shiftTag';
  * todo add a subscription to update jobs array
  * todo remove tag from state when its corresponding delete button is pressed
  * todo replace Picker with RNPickerSelect
+ * 		? check versus the month and year to see why the label issue is happening
  */
 
 const CreateShift = () => {
@@ -50,6 +52,8 @@ const CreateShift = () => {
 	const [hoursToggled, setHoursToggled] = useState(false);
 	const [job, setJob] = useState('default');
 	const [jobs, setJobs] = useState([]);
+	const [jobItems, setJobItems] = useState([]);
+	const [jobLabel, setJobLabel] = useState('');
 	const [tag, setTag] = useState('');
 	const [tags, setTags] = useState([]);
 	const [isInTimePickerVisible, setInTimePickerVisibility] = useState(false);
@@ -63,14 +67,23 @@ const CreateShift = () => {
 		getJobs();
 	}, []);
 
+	// create job array for RNPickerSelect
+	useEffect(() => {
+		var jobsToPick = [];
+
+		_.map(jobs, (job) => {
+			jobsToPick.push({
+				label: `${job.jobTitle}`,
+				value: `${job.id}`,
+			});
+		});
+		setJobItems(jobsToPick);
+	}, [jobs]);
+
 	// helper functions
 	const onAmountChange = (text) => {
 		setFormError('');
 		setAmount(text);
-	};
-	const onJobChange = (value) => {
-		setFormError('');
-		setJob(value);
 	};
 	const onHoursChange = (text) => {
 		setFormError('');
@@ -245,22 +258,11 @@ const CreateShift = () => {
 							{/* Position Worked */}
 							<View style={styles.rowComponent}>
 								<Text style={styles.subtitle}>Select position</Text>
-								<Picker
-									selectedValue={job}
-									style={Platform.OS === 'ios' ? {} : { height: 50 }}
-									onValueChange={(itemValue, itemIndex) =>
-										onJobChange(itemValue)
-									}
-								>
-									<Picker.Item label='Pick job' value='default' />
-									{_.map(jobs, (job) => (
-										<Picker.Item
-											key={job.id}
-											label={job.jobTitle}
-											value={job.id}
-										/>
-									))}
-								</Picker>
+								<RNPickerSelect
+									onValueChange={(value) => setJobLabel(value)}
+									items={jobItems}
+									value={jobLabel}
+								/>
 							</View>
 						</View>
 
@@ -436,7 +438,7 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		marginBottom: 36,
 	},
-	earningsIOS: { fontSize: 34 },
+	earningsIOS: { fontSize: 20 },
 	earningsAndroid: { height: 50 },
 	btnContainer: {
 		marginTop: 12,
