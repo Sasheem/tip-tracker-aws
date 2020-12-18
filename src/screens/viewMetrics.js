@@ -34,6 +34,9 @@ const ViewMetrics = () => {
 	const [topHours, setTopHours] = useState({});
 	const [topHourly, setTopHourly] = useState({});
 	const [dailyItems, setDailyItems] = useState([]);
+	const [weeklyItems, setWeeklyItems] = useState([]);
+	const [monthlyItems, setMonthlyItems] = useState([]);
+	const [yearlyItems, setYearlyItems] = useState([]);
 
 	// fetch shifts when component mounts and shifts state updates
 	useEffect(() => {
@@ -41,12 +44,9 @@ const ViewMetrics = () => {
 		getJobs();
 	}, []);
 
-	// set up daily, weekly, monthly, and yearly arrays for RNPickerSelect
+	// set up daily
 	useEffect(() => {
 		var daily = [];
-		// var weekly = [];
-		// var monthly = [];
-		// var yearly = [];
 
 		if (shifts.length !== 0) {
 			const sortedShifts = _.sortBy(shifts, (shift) => shift.createdAt);
@@ -58,16 +58,87 @@ const ViewMetrics = () => {
 					});
 				}
 			});
+		}
+		setDailyItems(daily);
+	}, [shifts]);
 
-			_.map(shifts, (shift) => {
-				/**
-				 * todo begin constructing the weekly array by reading every shift and adding the week to the array
-				 * * if it doesn't exist there already.
-				 */
+	// set up weekly
+	useEffect(() => {
+		var weekly = [];
+		var weeklyStrings = [];
+
+		if (shifts.length !== 0) {
+			const sortedShifts = _.sortBy(shifts, (shift) => shift.createdAt);
+			_.map(_.reverse(sortedShifts), (shift) => {
+				var tempWeek = moment(shift.createdAt, 'MM-DD-YYYY').format('w');
+
+				if (weeklyStrings.length === 0) {
+					weeklyStrings.push(`Week ${tempWeek}`);
+					weekly.push({ label: `Week ${tempWeek}`, value: tempWeek });
+				} else {
+					// check if tempWeek is NOT within weekly already
+					if (!weeklyStrings.includes(`Week ${tempWeek}`)) {
+						weeklyStrings.push(`Week ${tempWeek}`);
+						weekly.push({
+							label: `Week ${tempWeek}`,
+							value: tempWeek,
+						});
+					}
+				}
 			});
 		}
+		setWeeklyItems(weekly);
+	}, [shifts]);
 
-		setDailyItems(daily);
+	// set up monthly for RNPickerSelect
+	useEffect(() => {
+		var monthly = [];
+		var monthlyStrings = [];
+
+		// only perform if shifts is not empty
+		if (shifts.length !== 0) {
+			const sortedShifts = _.sortBy(shifts, (shift) => shift.createdAt);
+
+			_.map(_.reverse(sortedShifts), (shift) => {
+				var tempMonth = moment(shift.createdAt, 'MM-DD-YYYY').format('MMMM');
+
+				if (monthlyStrings.length === 0) {
+					monthlyStrings.push(tempMonth);
+					monthly.push({ label: tempMonth, value: tempMonth });
+				} else {
+					// check if tempMonth is not within monthly already
+					if (!monthlyStrings.includes(tempMonth)) {
+						monthlyStrings.push(tempMonth);
+						monthly.push({ label: tempMonth, value: tempMonth });
+					}
+				}
+			});
+		}
+		setMonthlyItems(monthly);
+	}, [shifts]);
+
+	// set up yearly for RNPickerSelect
+	useEffect(() => {
+		var yearly = [];
+		var yearlyStrings = [];
+
+		if (shifts.length !== 0) {
+			const sortedShifts = _.sortBy(shifts, (shift) => shift.createdAt);
+			_.map(_.reverse(sortedShifts), (shift) => {
+				var tempYear = moment(shift.createdAt, 'MM-DD-YYYY').format('YYYY');
+
+				if (yearlyStrings.length === 0) {
+					yearlyStrings.push(tempYear);
+					yearly.push({ label: tempYear, value: tempYear });
+				} else {
+					if (!yearlyStrings.includes(tempYear)) {
+						yearlyStrings.push(tempYear);
+						yearly.push({ label: tempYear, value: tempYear });
+					}
+				}
+			});
+		}
+		setYearlyItems(yearly);
 	}, [shifts]);
 
 	// calculate lifetime and top metrics
@@ -132,11 +203,43 @@ const ViewMetrics = () => {
 	}, [shifts, dailyLabel]);
 
 	// filter metrics based on week with momentjs
+	/**
+	 * todo - does not handle case for hourly based job
+	 * ? repeating code from calculate() b/c I an extra attr
+	 * ? is for week label
+	 */
 	useEffect(() => {
 		const results = _.filter(shifts, (shift) =>
 			moment(weeklyLabel, 'w').isSame(shift.createdAt, 'week')
 		);
-		setWeekly(calculate(results));
+		var totalAmount = 0.0;
+		var totalHours = 0.0;
+		var totalHourly = 0.0;
+
+		if (results.length !== 0) {
+			var weekNumber = moment(results[0].createdAt, 'MM-DD-YYYY').format('w');
+
+			_.map(results, (shift) => {
+				let amount = parseFloat(shift.amount !== '' ? shift.amount : '0.0');
+				let hours = parseFloat(shift.hours);
+
+				if (amount) {
+					totalAmount += amount;
+				}
+				if (hours) {
+					totalHours += hours;
+				}
+			});
+
+			totalHourly = totalAmount / totalHours;
+
+			setWeekly({
+				amount: totalAmount.toFixed(2),
+				hours: totalHours.toFixed(1),
+				hourly: totalHourly.toFixed(1),
+				label: `Week ${weekNumber}`,
+			});
+		}
 	}, [shifts, weeklyLabel]);
 
 	// filter metrics based on month with momentjs
@@ -162,7 +265,7 @@ const ViewMetrics = () => {
 		var totalHourly = 0.0;
 
 		_.map(shifts, (shift) => {
-			let amount = parseFloat(shift.amount);
+			let amount = parseFloat(shift.amount !== '' ? shift.amount : '0');
 			let hours = parseFloat(shift.hours);
 
 			if (amount) {
@@ -192,23 +295,6 @@ const ViewMetrics = () => {
 		const result = await API.graphql(graphqlOperation(listJobs));
 		setJobs(result.data.listJobs.items);
 	};
-
-	/**
-	 * todo construct this in useEffect based off shifts data
-	 */
-	// month values
-	const monthValues = [
-		{ label: 'November', value: 'November' },
-		{ label: 'December', value: 'December' },
-	];
-
-	// year values
-	const yearValues = [
-		{ label: '2021', value: '2021' },
-		{ label: '2020', value: '2020' },
-		{ label: '2019', value: '2019' },
-		{ label: '2018', value: '2018' },
-	];
 
 	return (
 		<View style={styles.container}>
@@ -260,11 +346,16 @@ const ViewMetrics = () => {
 				<Text style={styles.title}>Summary</Text>
 				{/* Daily */}
 				<View style={styles.summaryBlock}>
-					<Text>{dailyLabel}</Text>
+					{/* <Text>{dailyLabel}</Text> */}
 					<RNPickerSelect
+						placeholder={{
+							label: 'Select a day',
+							value: null,
+						}}
 						onValueChange={(value) => setDailyLabel(value)}
 						items={dailyItems}
 						value={dailyLabel}
+						useNativeAndroidPickerStyle={false}
 					/>
 					<View style={styles.row}>
 						<SummaryMetric title='Earnings' value={`$${daily.amount}`} />
@@ -280,7 +371,20 @@ const ViewMetrics = () => {
 
 				{/* Weekly */}
 				<View style={styles.summaryBlock}>
-					<Text style={styles.summaryButton}>[Weekly Button]</Text>
+					<View>
+						{/* <Text style={styles.summaryButton}>Week {weeklyLabel}</Text> */}
+						<RNPickerSelect
+							placeholder={{
+								label: 'Select a week',
+								value: null,
+							}}
+							onValueChange={(value) => setWeeklyLabel(value)}
+							items={weeklyItems}
+							value={weeklyLabel}
+							useNativeAndroidPickerStyle={false}
+						/>
+					</View>
+
 					<View style={styles.row}>
 						<SummaryMetric title='Earnings' value={`$${weekly.amount}`} />
 						<SummaryMetric title='Hourly' value={`${weekly.hourly} /hr`} />
@@ -290,10 +394,16 @@ const ViewMetrics = () => {
 
 				{/* Monthly */}
 				<View style={styles.summaryBlock}>
+					{/* <Text>{monthlyLabel}</Text> */}
 					<RNPickerSelect
+						placeholder={{
+							label: 'Select a month',
+							value: null,
+						}}
 						onValueChange={(value) => setMonthlyLabel(value)}
-						items={monthValues}
+						items={monthlyItems}
 						value={monthlyLabel}
+						useNativeAndroidPickerStyle={false}
 					/>
 					<View style={styles.row}>
 						<SummaryMetric title='Earnings' value={`$${monthly.amount}`} />
@@ -305,9 +415,14 @@ const ViewMetrics = () => {
 				{/* Yearly */}
 				<View style={styles.summaryBlock}>
 					<RNPickerSelect
+						placeholder={{
+							label: 'Select a year',
+							value: null,
+						}}
 						onValueChange={(value) => setYearlyLabel(value)}
-						items={yearValues}
+						items={yearlyItems}
 						value={yearlyLabel}
+						useNativeAndroidPickerStyle={false}
 					/>
 					<View style={styles.row}>
 						<SummaryMetric title='Earnings' value={`$${yearly.amount}`} />
