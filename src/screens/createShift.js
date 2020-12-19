@@ -157,7 +157,7 @@ const CreateShift = () => {
 	// handle form submit, create shift
 	const handleSubmit = () => {
 		var duration = '';
-
+		console.log(`job: ${jobLabel}`);
 		if (tag !== '') {
 			return setFormError('Add your current tag to shift');
 		}
@@ -195,7 +195,7 @@ const CreateShift = () => {
 		setHours('');
 		setInTime('');
 		setOutTime('');
-		setJob('default');
+		setJob(null);
 		setTags([]);
 	};
 
@@ -259,9 +259,9 @@ const CreateShift = () => {
 							<View style={styles.rowComponent}>
 								<Text style={styles.subtitle}>Select position</Text>
 								<RNPickerSelect
-									onValueChange={(value) => setJobLabel(value)}
+									onValueChange={(value) => setJob(value)}
 									items={jobItems}
-									value={jobLabel}
+									value={job}
 								/>
 							</View>
 						</View>
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		marginBottom: 36,
 	},
-	earningsIOS: { fontSize: 20 },
+	earningsIOS: { fontSize: 16 },
 	earningsAndroid: { height: 50 },
 	btnContainer: {
 		marginTop: 12,
