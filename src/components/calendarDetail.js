@@ -6,11 +6,15 @@ import _ from 'lodash';
 import { API, graphqlOperation } from 'aws-amplify';
 import { deleteShift, updateShift } from '../graphql/mutations';
 
+import EditShift from './editShift';
+
 const CalendarDetail = ({ currentDetail, jobs }) => {
 	// console.log(`currentDetail => ${JSON.stringify(currentDetail)}`);
 	const shifts = Object.entries(currentDetail);
 	// console.log(`currentDetail => shifts: ${JSON.stringify(shifts)}`);
-	const [modalVisible, setModalVisible] = useState(false);
+	const [deleteModal, setDeleteModal] = useState(false);
+	const [editModal, setEditModal] = useState(false);
+	const [modifiedShift, setModifiedShift] = useState({});
 
 	const handleDeleteShift = () => {
 		// prepare data
@@ -22,21 +26,37 @@ const CalendarDetail = ({ currentDetail, jobs }) => {
 		API.graphql(graphqlOperation(deleteShift, { input }));
 
 		// close modal
-		setModalVisible(false);
+		setDeleteModal(false);
+	};
+
+	const handleEditShift = () => {
+		// compare data to find diff values
+		// prepare input with this data
+
+		// save edit to backend
+
+		// close modal
+		setEditModal(false);
 	};
 
 	return (
 		<View style={styles.detailerContainer}>
 			{Object.keys(currentDetail).length !== 0 && (
 				<View style={styles.header}>
+					<TouchableOpacity
+						style={{ flex: 0.5 }}
+						onPress={() => setEditModal(true)}
+					>
+						<Text style={{ color: `lightgrey`, textAlign: `right` }}>Edit</Text>
+					</TouchableOpacity>
 					<Text style={styles.headerText}>
 						{currentDetail[Object.keys(currentDetail)[0]].createdAt}
 					</Text>
 					<TouchableOpacity
-						style={{ color: `red`, flex: 0.5 }}
-						onPress={() => setModalVisible(true)}
+						style={{ flex: 0.75 }}
+						onPress={() => setDeleteModal(true)}
 					>
-						<Text>Delete</Text>
+						<Text style={{ color: `red`, textAlign: `left` }}>Delete</Text>
 					</TouchableOpacity>
 				</View>
 			)}
@@ -62,7 +82,24 @@ const CalendarDetail = ({ currentDetail, jobs }) => {
 							<Modal
 								animationType='slide'
 								transparent={true}
-								visible={modalVisible}
+								visible={editModal}
+							>
+								<View style={styles.centeredContainer}>
+									<View style={styles.modalContainer}>
+										<Text>Edit Shift</Text>
+										<EditShift
+											shift={item[1] ? item[1] : {}}
+											job={jobResult}
+											setEditModal={setEditModal}
+											handleEditShift={handleEditShift}
+										/>
+									</View>
+								</View>
+							</Modal>
+							<Modal
+								animationType='slide'
+								transparent={true}
+								visible={deleteModal}
 							>
 								<View style={styles.centeredContainer}>
 									<View style={styles.modalContainer}>
@@ -77,7 +114,7 @@ const CalendarDetail = ({ currentDetail, jobs }) => {
 											<TouchableOpacity
 												style={styles.modalButton}
 												onPress={() => {
-													setModalVisible(!modalVisible);
+													setDeleteModal(!deleteModal);
 												}}
 											>
 												<Text>No</Text>
@@ -220,6 +257,7 @@ const styles = StyleSheet.create({
 		flexDirection: `row`,
 		justifyContent: `space-evenly`,
 	},
+	editForm: {},
 });
 
 export default CalendarDetail;
