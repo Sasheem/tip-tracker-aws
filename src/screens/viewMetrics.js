@@ -44,7 +44,7 @@ const ViewMetrics = () => {
 		getJobs();
 	}, []);
 
-	// set up daily
+	// set up daily items array for RNPickerSelect
 	useEffect(() => {
 		var daily = [];
 
@@ -62,7 +62,7 @@ const ViewMetrics = () => {
 		setDailyItems(daily);
 	}, [shifts]);
 
-	// set up weekly
+	// set up weekly items array for RNPickerSelect
 	useEffect(() => {
 		var weekly = [];
 		var weeklyStrings = [];
@@ -87,10 +87,11 @@ const ViewMetrics = () => {
 				}
 			});
 		}
+		console.log(`weekly: ${JSON.stringify(weekly)}`);
 		setWeeklyItems(weekly);
 	}, [shifts]);
 
-	// set up monthly for RNPickerSelect
+	// set up monthly items array for RNPickerSelect
 	useEffect(() => {
 		var monthly = [];
 		var monthlyStrings = [];
@@ -117,7 +118,7 @@ const ViewMetrics = () => {
 		setMonthlyItems(monthly);
 	}, [shifts]);
 
-	// set up yearly for RNPickerSelect
+	// set up yearly items array for RNPickerSelect
 	useEffect(() => {
 		var yearly = [];
 		var yearlyStrings = [];
@@ -209,12 +210,13 @@ const ViewMetrics = () => {
 	 * ? is for week label
 	 */
 	useEffect(() => {
-		const results = _.filter(shifts, (shift) =>
-			moment(weeklyLabel, 'w').isSame(shift.createdAt, 'week')
-		);
 		var totalAmount = 0.0;
 		var totalHours = 0.0;
 		var totalHourly = 0.0;
+		const results = _.filter(shifts, (shift) => {
+			// using == because one is a number and other is string, respectively
+			return weeklyLabel == moment(shift.createdAt, 'MM-DD-YYYY').week();
+		});
 
 		if (results.length !== 0) {
 			var weekNumber = moment(results[0].createdAt, 'MM-DD-YYYY').format('w');
