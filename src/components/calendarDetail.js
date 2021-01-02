@@ -15,6 +15,7 @@ import { API, graphqlOperation } from 'aws-amplify';
 import { deleteShift, updateShift } from '../graphql/mutations';
 
 import EditShift from './editShift';
+import DeleteShift from './deleteShift';
 import ShiftTag from './shiftTag';
 
 const CalendarDetail = ({ currentDetail, jobs }) => {
@@ -112,23 +113,10 @@ const CalendarDetail = ({ currentDetail, jobs }) => {
 							>
 								<View style={styles.centeredContainer}>
 									<View style={styles.modalContainer}>
-										<Text>Are you sure you want to delete this shift?</Text>
-										<View style={styles.modalButtonContainer}>
-											<TouchableOpacity
-												style={styles.modalButton}
-												onPress={handleDeleteShift}
-											>
-												<Text>Yes</Text>
-											</TouchableOpacity>
-											<TouchableOpacity
-												style={styles.modalButton}
-												onPress={() => {
-													setDeleteModal(!deleteModal);
-												}}
-											>
-												<Text>No</Text>
-											</TouchableOpacity>
-										</View>
+										<DeleteShift
+											setDeleteModal={setDeleteModal}
+											handleDeleteShift={handleDeleteShift}
+										/>
 									</View>
 								</View>
 							</Modal>
