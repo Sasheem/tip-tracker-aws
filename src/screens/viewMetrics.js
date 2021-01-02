@@ -26,6 +26,8 @@ const ViewMetrics = () => {
 	const [weeklyLabel, setWeeklyLabel] = useState(moment().format('w'));
 	const [weekly, setWeekly] = useState({});
 	const [monthlyLabel, setMonthlyLabel] = useState(moment().format('MMMM'));
+	const [monthlyMonthLabel, setMonthlyMonthLabel] = useState('');
+	const [monthlyYearLabel, setMonthlyYearLabel] = useState('');
 	const [monthly, setMonthly] = useState({});
 	const [yearlyLabel, setYearlyLabel] = useState(moment().format('YYYY'));
 	const [yearly, setYearly] = useState({});
@@ -102,15 +104,22 @@ const ViewMetrics = () => {
 
 			_.map(_.reverse(sortedShifts), (shift) => {
 				var tempMonth = moment(shift.createdAt, 'MM-DD-YYYY').format('MMMM');
+				var tempYear = moment(shift.createdAt, 'MM-DD-YYYY').format('YYYY');
 
 				if (monthlyStrings.length === 0) {
 					monthlyStrings.push(tempMonth);
-					monthly.push({ label: tempMonth, value: tempMonth });
+					monthly.push({
+						label: `${tempMonth} ${tempYear}`,
+						value: `${tempMonth} ${tempYear}`,
+					});
 				} else {
 					// check if tempMonth is not within monthly already
 					if (!monthlyStrings.includes(tempMonth)) {
 						monthlyStrings.push(tempMonth);
-						monthly.push({ label: tempMonth, value: tempMonth });
+						monthly.push({
+							label: `${tempMonth} ${tempYear}`,
+							value: `${tempMonth} ${tempYear}`,
+						});
 					}
 				}
 			});
@@ -205,9 +214,12 @@ const ViewMetrics = () => {
 
 	// filter metrics based on week with momentjs
 	/**
-	 * todo - does not handle case for hourly based job
+	 * todo - 1) Does not yet handle case for hourly based job
 	 * ? repeating code from calculate() b/c I an extra attr
 	 * ? is for week label
+	 *
+	 * todo - 2) filter by year, I don't see it now but it will overlap the years
+	 * todo - when november/december come around
 	 */
 	useEffect(() => {
 		var totalAmount = 0.0;
@@ -246,9 +258,11 @@ const ViewMetrics = () => {
 
 	// filter metrics based on month with momentjs
 	useEffect(() => {
-		const results = _.filter(shifts, (shift) =>
-			moment(monthlyLabel, 'MMMM').isSame(shift.createdAt, 'month')
-		);
+		const results = _.filter(shifts, (shift) => {
+			let monthTemp = moment(shift.createdAt).format('MMMM');
+			let yearTemp = moment(shift.createdAt).format('YYYY');
+			return monthTemp === monthlyMonthLabel && yearTemp == monthlyYearLabel;
+		});
 		setMonthly(calculate(results));
 	}, [shifts, monthlyLabel]);
 
@@ -296,6 +310,16 @@ const ViewMetrics = () => {
 	const getJobs = async () => {
 		const result = await API.graphql(graphqlOperation(listJobs));
 		setJobs(result.data.listJobs.items);
+	};
+
+	// helper function - set monthly
+	const setMonthlyValues = (value) => {
+		if (value) {
+			setMonthlyLabel(value);
+			var monthlySplit = value.split(' ');
+			setMonthlyMonthLabel(monthlySplit[0]);
+			setMonthlyYearLabel(monthlySplit[1]);
+		}
 	};
 
 	return (
@@ -402,7 +426,7 @@ const ViewMetrics = () => {
 							label: 'Select a month',
 							value: null,
 						}}
-						onValueChange={(value) => setMonthlyLabel(value)}
+						onValueChange={(value) => setMonthlyValues(value)}
 						items={monthlyItems}
 						value={monthlyLabel}
 						useNativeAndroidPickerStyle={false}
