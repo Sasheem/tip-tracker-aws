@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Modal } from 'react-native';
+import {
+	StyleSheet,
+	View,
+	Text,
+	TouchableOpacity,
+	Modal,
+	SafeAreaView,
+	ScrollView,
+} from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import Swiper from 'react-native-swiper';
 import _ from 'lodash';
@@ -7,6 +15,7 @@ import { API, graphqlOperation } from 'aws-amplify';
 import { deleteShift, updateShift } from '../graphql/mutations';
 
 import EditShift from './editShift';
+import ShiftTag from './shiftTag';
 
 const CalendarDetail = ({ currentDetail, jobs }) => {
 	// console.log(`currentDetail => ${JSON.stringify(currentDetail)}`);
@@ -47,7 +56,7 @@ const CalendarDetail = ({ currentDetail, jobs }) => {
 						style={{ flex: 0.5 }}
 						onPress={() => setEditModal(true)}
 					>
-						<Text style={{ color: `lightgrey`, textAlign: `right` }}>Edit</Text>
+						<Text style={{ color: `#016FB9`, textAlign: `right` }}>Edit</Text>
 					</TouchableOpacity>
 					<Text style={styles.headerText}>
 						{currentDetail[Object.keys(currentDetail)[0]].createdAt}
@@ -155,23 +164,15 @@ const CalendarDetail = ({ currentDetail, jobs }) => {
 								</View>
 								<View style={{ flex: 2 }}>
 									<Text>Tags</Text>
-									<View style={styles.tagsContainer}>
-										{_.map(tags, (tag) => {
-											return (
-												<Text
-													key={tag}
-													style={{
-														borderWidth: 1,
-														padding: 2,
-														borderRadius: 5,
-														marginRight: 5,
-													}}
-												>
-													{tag}
-												</Text>
-											);
-										})}
-									</View>
+									<SafeAreaView>
+										<ScrollView horizontal={true}>
+											{_.map(tags, (tag) => {
+												return (
+													<ShiftTag key={tag} text={tag} forDetail={true} />
+												);
+											})}
+										</ScrollView>
+									</SafeAreaView>
 								</View>
 							</View>
 						</View>
