@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
 /**
@@ -7,14 +7,14 @@ import { AntDesign } from '@expo/vector-icons';
  * @param {text from parent newShiftForm} param0
  */
 
-const ShiftTag = ({ text }) => {
+const ShiftTag = ({ text, forDetail, setTagToDelete }) => {
 	return (
 		<View
 			style={{
 				flexDirection: `row`,
 				justifyContent: `center`,
 				alignItems: `center`,
-				backgroundColor: `rgba(139, 123, 119, 0.4)`,
+				backgroundColor: `#22AED1`,
 				paddingTop: 1,
 				paddingBottom: 1,
 				paddingLeft: 5,
@@ -24,15 +24,17 @@ const ShiftTag = ({ text }) => {
 				marginRight: 10,
 			}}
 		>
-			<Text style={{ color: `rgba(139, 123, 119, 1)`, margin: 0, padding: 0 }}>
-				{text}
-			</Text>
-			<AntDesign
-				name='close'
-				size={16}
-				color='rgba(139, 123, 119, 1)'
-				style={{ marginTop: 2 }}
-			/>
+			<Text style={{ color: `#F7F9F9`, margin: 0, padding: 0 }}>{text}</Text>
+			{forDetail === false && (
+				<TouchableOpacity onPress={() => setTagToDelete(text)}>
+					<AntDesign
+						name='close'
+						size={16}
+						color='#F7F9F9'
+						style={{ marginTop: 2 }}
+					/>
+				</TouchableOpacity>
+			)}
 		</View>
 	);
 };

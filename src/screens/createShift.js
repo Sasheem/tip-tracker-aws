@@ -55,11 +55,21 @@ const CreateShift = () => {
 	const [jobItems, setJobItems] = useState([]);
 	const [jobLabel, setJobLabel] = useState('');
 	const [tag, setTag] = useState('');
+	const [tagToDelete, setTagToDelete] = useState('');
 	const [tags, setTags] = useState([]);
 	const [isInTimePickerVisible, setInTimePickerVisibility] = useState(false);
 	const [isOutTimePickerVisible, setOutTimePickerVisibility] = useState(false);
 	const [tagError, setTagError] = useState('');
 	const [formError, setFormError] = useState('');
+
+	// handle removing tag from state
+	useEffect(() => {
+		if (tagToDelete !== '') {
+			var newTags = _.filter(tags, (item) => item !== tagToDelete);
+			console.log(`newTags: ${newTags.length}`);
+			setTags(newTags);
+		}
+	}, [tagToDelete]);
 
 	// when component mounts fetch jobs
 	useEffect(() => {
@@ -369,7 +379,14 @@ const CreateShift = () => {
 							<SafeAreaView>
 								<ScrollView horizontal={true}>
 									{tags.length !== 0 &&
-										tags.map((tag) => <ShiftTag key={tag} text={tag} />)}
+										_.map(tags, (item) => (
+											<ShiftTag
+												key={item}
+												text={item}
+												forDetail={false}
+												setTagToDelete={setTagToDelete}
+											/>
+										))}
 								</ScrollView>
 							</SafeAreaView>
 
