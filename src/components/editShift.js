@@ -6,6 +6,7 @@ import {
 	TouchableOpacity,
 	TextInput,
 	Button,
+	Switch,
 	SafeAreaView,
 	ScrollView,
 } from 'react-native';
@@ -29,6 +30,17 @@ const EditShift = ({ shift, job, setEditModal, handleEditShift }) => {
 	const [isInTimePickerVisible, setInTimePickerVisibility] = useState(false);
 	const [isOutTimePickerVisible, setOutTimePickerVisibility] = useState(false);
 	const [tag, setTag] = useState('');
+	const [hoursToggled, setHoursToggled] = useState(false);
+
+	// handle hours toggled
+	const toggleSwitch = () => {
+		setHoursToggled(!hoursToggled);
+	};
+
+	const showInTimePicker = () => setInTimePickerVisibility(true);
+	const showOutTimePicker = () => setOutTimePickerVisibility(true);
+	const hideInTimePicker = () => setInTimePickerVisibility(false);
+	const hideOutTimePicker = () => setOutTimePickerVisibility(false);
 
 	// handle creating a tag
 	const handleCreateTag = () => {
@@ -80,10 +92,13 @@ const EditShift = ({ shift, job, setEditModal, handleEditShift }) => {
 	return (
 		<View style={styles.container}>
 			<Text>{shift.createdAt}</Text>
+
+			{/* Amount and Position Inputs */}
 			<View style={styles.row}>
 				<View style={styles.itemInner}>
 					<Text style={styles.subtitle}>Amount</Text>
 					<TextInput
+						style={styles.input}
 						placeholder={`$${shift.amount}`}
 						keyboardType='decimal-pad'
 						returnKeyType='done'
@@ -93,69 +108,107 @@ const EditShift = ({ shift, job, setEditModal, handleEditShift }) => {
 				</View>
 				<View style={styles.itemInner}>
 					<Text style={styles.subtitle}>Position</Text>
-					<Text>{job.jobTitle}</Text>
+					<TouchableOpacity style={styles.input}>
+						<Text>{job.jobTitle}</Text>
+					</TouchableOpacity>
 				</View>
 			</View>
-			<View style={styles.row}>
-				<View style={styles.itemInner}>
-					<Text style={styles.subtitle}>In Time</Text>
-					<TouchableOpacity onPress={() => setInTimePickerVisibility(true)}>
-						<Text>
-							{shift.inTime !== ''
-								? moment(shift.inTime).format('hh:mm a')
-								: 'In Time'}
-						</Text>
-					</TouchableOpacity>
 
-					<DateTimePickerModal
-						isVisible={isInTimePickerVisible}
-						mode='time'
-						onConfirm={handleInTimeConfirm}
-						onCancel={() => setInTimePickerVisibility(false)}
+			{/* In and Out Times */}
+			{hoursToggled ? (
+				<View>
+					<Text style={styles.subtitle}>Hours worked</Text>
+					<TextInput
+						placeholder='4.5'
+						// autoFocus={true}
+						keyboardType='decimal-pad'
+						style={
+							Platform.OS === 'ios'
+								? [styles.earningsIOS, styles.input]
+								: styles.earningsAndroid
+						}
+						onChangeText={(text) => onHoursChange(text)}
+						value={shift.hours}
 					/>
 				</View>
+			) : (
+				<View style={{ flexDirection: `row`, marginVertical: 20 }}>
+					<View style={styles.itemInner}>
+						<Text style={styles.subtitle}>Clocked in</Text>
+						<TouchableOpacity onPress={showInTimePicker} style={styles.input}>
+							<Text>
+								{shift.inTime !== ''
+									? moment(shift.inTime).format('hh:mm a')
+									: 'In Time'}
+							</Text>
+						</TouchableOpacity>
+						<DateTimePickerModal
+							isVisible={isInTimePickerVisible}
+							mode='time'
+							onConfirm={handleInTimeConfirm}
+							onCancel={hideInTimePicker}
+						/>
+					</View>
 
-				<View style={styles.itemInner}>
-					<Text style={styles.subtitle}>Out Time</Text>
-					<TouchableOpacity onPress={() => setOutTimePickerVisibility(true)}>
-						<Text>
-							{shift.outTime !== ''
-								? moment(shift.outTime).format('hh:mm a')
-								: 'Out Time'}
-						</Text>
-					</TouchableOpacity>
-
-					<DateTimePickerModal
-						isVisible={isOutTimePickerVisible}
-						mode='time'
-						onConfirm={handleOutTimeConfirm}
-						onCancel={() => setOutTimePickerVisibility(false)}
-					/>
+					<View style={styles.itemInner}>
+						<Text style={styles.subtitle}>Clocked out</Text>
+						<TouchableOpacity onPress={showOutTimePicker} style={styles.input}>
+							<Text>
+								{shift.outTime !== ''
+									? moment(shift.outTime).format('hh:mm a')
+									: 'Out Time'}
+							</Text>
+						</TouchableOpacity>
+						<DateTimePickerModal
+							isVisible={isOutTimePickerVisible}
+							mode='time'
+							onConfirm={handleOutTimeConfirm}
+							onCancel={hideOutTimePicker}
+						/>
+					</View>
 				</View>
-			</View>
-			<View>
-				<Text>Hours</Text>
-				<TextInput
-					placeholder={`${shift.hours} hrs`}
-					keyboardType='decimal-pad'
-					returnKeyType='done'
-					onChangeText={(text) => onHoursChange(text)}
-					value={data.hours}
-				/>
-			</View>
-			<Text style={styles.subtitle}>Add a tag</Text>
+			)}
 			<View
 				style={{
+					flex: 1,
 					flexDirection: `row`,
+					alignItems: `center`,
+					justifyContent: `flex-end`,
+					marginTop: 20,
+					marginBottom: 20,
+					width: `100%`,
 				}}
+			>
+				<Text>Hours</Text>
+				<Switch
+					trackColor={{ false: '#767577', true: '#81b0ff' }}
+					thumbColor={hoursToggled ? '#f5dd4b' : '#f4f3f4'}
+					ios_backgroundColor='#3e3e3e'
+					onValueChange={toggleSwitch}
+					value={hoursToggled}
+				/>
+			</View>
+
+			{/* Tag Input */}
+			<Text style={styles.subtitle}>Add a tag</Text>
+			<View
+				style={[
+					{
+						flexDirection: `row`,
+						marginBottom: 5,
+					},
+					styles.input,
+				]}
 			>
 				<TextInput
 					placeholder="Ex: Mother's Day"
-					style={{ height: 50, flex: 3 }}
+					style={{ flex: 3 }}
 					onChangeText={(text) => onTagChange(text)}
 					value={tag}
 				/>
-				<View style={{ flex: 1, justifyContent: `center` }}>
+				<View
+					style={{ flex: 1, justifyContent: `center`, alignItems: `flex-end` }}
+				>
 					<TouchableOpacity onPress={handleCreateTag}>
 						<AntDesign name='plus' size={24} color='blue' />
 					</TouchableOpacity>
@@ -192,7 +245,7 @@ const EditShift = ({ shift, job, setEditModal, handleEditShift }) => {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 0.5,
+		flex: 0.6,
 		justifyContent: `space-between`,
 	},
 	tag: {
@@ -232,10 +285,25 @@ const styles = StyleSheet.create({
 	},
 	itemInner: {
 		flex: 1,
+		marginRight: 10,
 	},
 	itemOuter: {},
 	timeText: {
 		textAlign: `left`,
+	},
+
+	input: {
+		borderWidth: 1,
+		borderColor: `#A2A7A5`,
+		borderRadius: 5,
+		paddingVertical: 10,
+		paddingHorizontal: 10,
+	},
+	rowComponent: {
+		flex: 1,
+	},
+	rowFiller: {
+		flex: 0.1,
 	},
 });
 

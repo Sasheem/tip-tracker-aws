@@ -245,17 +245,16 @@ const CreateShift = () => {
 						</View>
 
 						{/* Amount Earned + Position Worked */}
-						<View style={styles.row2x}>
+						<View style={[styles.row2x, { marginBottom: 20 }]}>
 							{/* Amount Earned */}
 							<View style={styles.rowComponent}>
 								<Text style={styles.subtitle}>Amount earned</Text>
 								<TextInput
 									placeholder='$0.00'
-									style={styles.textInput}
 									keyboardType='decimal-pad'
 									style={
 										Platform.OS === 'ios'
-											? styles.earningsIOS
+											? [styles.earningsIOS, styles.input]
 											: styles.earningsAndroid
 									}
 									onChangeText={(text) => onAmountChange(text)}
@@ -268,16 +267,18 @@ const CreateShift = () => {
 							{/* Position Worked */}
 							<View style={styles.rowComponent}>
 								<Text style={styles.subtitle}>Select position</Text>
-								<RNPickerSelect
-									onValueChange={(value) => setJob(value)}
-									items={jobItems}
-									value={job}
-								/>
+								<View style={styles.input}>
+									<RNPickerSelect
+										onValueChange={(value) => setJob(value)}
+										items={jobItems}
+										value={job}
+									/>
+								</View>
 							</View>
 						</View>
 
 						{/* Hours Worked */}
-						<View>
+						<View style={{ marginBottom: 20 }}>
 							{hoursToggled ? (
 								<View>
 									<Text style={styles.subtitle}>Hours worked</Text>
@@ -287,7 +288,7 @@ const CreateShift = () => {
 										keyboardType='decimal-pad'
 										style={
 											Platform.OS === 'ios'
-												? styles.earningsIOS
+												? [styles.earningsIOS, styles.input]
 												: styles.earningsAndroid
 										}
 										onChangeText={(text) => onHoursChange(text)}
@@ -295,17 +296,19 @@ const CreateShift = () => {
 									/>
 								</View>
 							) : (
-								<View style={{ flexDirection: `row` }}>
+								<View style={{ flexDirection: `row`, marginBottom: 20 }}>
 									<View style={styles.rowComponent}>
 										<Text style={styles.subtitle}>Clocked in</Text>
-										<Button
-											title={
-												inTime !== ''
-													? moment(inTime).format('hh:mm a')
-													: 'In Time'
-											}
+										<TouchableOpacity
 											onPress={showInTimePicker}
-										/>
+											style={styles.input}
+										>
+											<Text>
+												{inTime !== ''
+													? moment(inTime).format('hh:mm a')
+													: 'In Time'}
+											</Text>
+										</TouchableOpacity>
 										<DateTimePickerModal
 											isVisible={isInTimePickerVisible}
 											mode='time'
@@ -316,14 +319,16 @@ const CreateShift = () => {
 									<View style={styles.rowFiller} />
 									<View style={styles.rowComponent}>
 										<Text style={styles.subtitle}>Clocked out</Text>
-										<Button
-											title={
-												outTime !== ''
-													? moment(outTime).format('hh:mm a')
-													: 'Out Time'
-											}
+										<TouchableOpacity
 											onPress={showOutTimePicker}
-										/>
+											style={styles.input}
+										>
+											<Text>
+												{outTime !== ''
+													? moment(outTime).format('hh:mm a')
+													: 'Out Time'}
+											</Text>
+										</TouchableOpacity>
 										<DateTimePickerModal
 											isVisible={isOutTimePickerVisible}
 											mode='time'
@@ -359,17 +364,24 @@ const CreateShift = () => {
 						<View>
 							<Text style={styles.subtitle}>Add Shift Tags</Text>
 							<View
-								style={{
-									flexDirection: `row`,
-								}}
+								style={[
+									{ flexDirection: `row`, marginBottom: 10 },
+									styles.input,
+								]}
 							>
 								<TextInput
 									placeholder="Ex: Mother's Day"
-									style={{ height: 50, flex: 3 }}
+									style={{ flex: 3 }}
 									onChangeText={(text) => onTagChange(text)}
 									value={tag}
 								/>
-								<View style={{ flex: 1, justifyContent: `center` }}>
+								<View
+									style={{
+										flex: 1,
+										justifyContent: `center`,
+										alignItems: `flex-end`,
+									}}
+								>
 									<TouchableOpacity onPress={handleCreateTag}>
 										<AntDesign name='plus' size={24} color='blue' />
 									</TouchableOpacity>
@@ -468,6 +480,35 @@ const styles = StyleSheet.create({
 	},
 	rowFiller: {
 		flex: 0.1,
+	},
+	input: {
+		borderWidth: 1,
+		borderColor: `#A2A7A5`,
+		borderRadius: 5,
+		paddingTop: 10,
+		paddingLeft: 10,
+		paddingRight: 10,
+		paddingBottom: 10,
+	},
+	inputIOS: {
+		fontSize: 16,
+		paddingVertical: 12,
+		paddingHorizontal: 10,
+		borderWidth: 1,
+		borderColor: 'gray',
+		borderRadius: 4,
+		color: 'black',
+		paddingRight: 30, // to ensure the text is never behind the icon
+	},
+	inputAndroid: {
+		fontSize: 16,
+		paddingHorizontal: 10,
+		paddingVertical: 8,
+		borderWidth: 0.5,
+		borderColor: 'purple',
+		borderRadius: 8,
+		color: 'black',
+		paddingRight: 30, // to ensure the text is never behind the icon
 	},
 });
 
