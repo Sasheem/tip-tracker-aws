@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import {
+	StyleSheet,
+	Text,
+	View,
+	TouchableOpacity,
+	Platform,
+} from 'react-native';
 import { API, graphqlOperation } from 'aws-amplify';
 import moment from 'moment';
 import _ from 'lodash';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import RNPickerSelect, { defaultStyles } from 'react-native-picker-select';
+import RNPickerSelect from 'react-native-picker-select';
+import { AntDesign } from '@expo/vector-icons';
 
 import { listJobs, listShifts } from '../graphql/queries';
 
@@ -46,12 +52,21 @@ const ViewMetrics = () => {
 		getJobs();
 	}, []);
 
+	/**
+	 * todo get daily label to be set upon loading screen
+	 */
 	// set up daily items array for RNPickerSelect
 	useEffect(() => {
 		var daily = [];
 
 		if (shifts.length !== 0) {
 			const sortedShifts = _.sortBy(shifts, (shift) => shift.createdAt);
+			console.log(
+				`setting to last shift in sortedShifts: ${JSON.stringify(
+					sortedShifts[sortedShifts.length - 1]
+				)}`
+			);
+
 			_.map(_.reverse(sortedShifts), (shift) => {
 				if (shift.amount) {
 					daily.push({
@@ -60,6 +75,9 @@ const ViewMetrics = () => {
 					});
 				}
 			});
+
+			// set daily to last of sortedShifts, aka most recent shift
+			setDaily({ ...sortedShifts[sortedShifts.length - 1] });
 		}
 		setDailyItems(daily);
 	}, [shifts]);
@@ -197,7 +215,7 @@ const ViewMetrics = () => {
 
 			lifetimeHourly = lifetimeAmount / lifetimeHours;
 			setLifetime({
-				amount: lifetimeAmount.toFixed(2),
+				amount: lifetimeAmount.toFixed(0),
 				hours: lifetimeHours.toFixed(1),
 				hourly: lifetimeHourly.toFixed(1),
 			});
@@ -328,17 +346,19 @@ const ViewMetrics = () => {
 			<View>
 				{/* Top Row */}
 				<Text style={styles.title}>Top Metrics</Text>
-				<View style={styles.row}>
+				<View style={[styles.flexRow, { paddingHorizontal: 10 }]}>
 					<MetricComponent
 						title='Earnings'
 						value={`$${topAmount.amount}`}
 						date={`${topAmount.createdAt}`}
 					/>
+					<View style={styles.flexFillSm} />
 					<MetricComponent
 						title='Hourly'
-						value={`${topHourly.hourly} /hr`}
+						value={topHourly.hourly}
 						date={`${topHourly.createdAt}`}
 					/>
+					<View style={styles.flexFillSm} />
 					<MetricComponent
 						title='Hours'
 						value={`${topHours.hours}`}
@@ -348,22 +368,16 @@ const ViewMetrics = () => {
 
 				{/* Lifetime Row */}
 				<Text style={styles.title}>Lifetime Metrics</Text>
-				<View style={styles.row}>
+				<View style={[styles.flexRow, { paddingHorizontal: 10 }]}>
 					<MetricComponent
 						title='Earnings'
 						value={`$${lifetime.amount}`}
 						date={null}
 					/>
-					<MetricComponent
-						title='Hourly'
-						value={`${lifetime.hourly} /hr`}
-						date={null}
-					/>
-					<MetricComponent
-						title='Hours'
-						value={`${lifetime.hours} hrs`}
-						date={null}
-					/>
+					<View style={styles.flexFillSm} />
+					<MetricComponent title='Hourly' value={lifetime.hourly} date={null} />
+					<View style={styles.flexFillSm} />
+					<MetricComponent title='Hours' value={lifetime.hours} date={null} />
 				</View>
 			</View>
 
@@ -372,7 +386,7 @@ const ViewMetrics = () => {
 				<Text style={styles.title}>Summary</Text>
 				{/* Daily */}
 				<View style={styles.summaryBlock}>
-					{/* <Text>{dailyLabel}</Text> */}
+					{/* {Platform.OS === 'android' && <Text>{dailyLabel}</Text>} */}
 					<RNPickerSelect
 						placeholder={{
 							label: 'Select a day',
@@ -382,23 +396,31 @@ const ViewMetrics = () => {
 						items={dailyItems}
 						value={dailyLabel}
 						useNativeAndroidPickerStyle={false}
+						Icon={() => <AntDesign name='down' size={20} color='#D1D5DE' />}
+						style={pickerStyles}
 					/>
-					<View style={styles.row}>
+					<View style={styles.flexRow}>
+						<View style={styles.flexFillSm} />
 						<SummaryMetric title='Earnings' value={`$${daily.amount}`} />
+						<View style={styles.flexFillSm} />
 						<SummaryMetric
 							title='Hourly'
-							value={` ${(
+							value={(
 								parseFloat(daily.amount) / parseFloat(daily.hours)
-							).toFixed(1)} /hr`}
+							).toFixed(1)}
 						/>
-						<SummaryMetric title='Hours' value={`${daily.hours} hrs`} />
+						<View style={styles.flexFillSm} />
+						<SummaryMetric title='Hours' value={daily.hours} />
+						<View style={styles.flexFillSm} />
 					</View>
 				</View>
 
 				{/* Weekly */}
 				<View style={styles.summaryBlock}>
 					<View>
-						{/* <Text style={styles.summaryButton}>Week {weeklyLabel}</Text> */}
+						{/* {Platform.OS === 'android' && (
+							<Text style={styles.summaryButton}>Week {weeklyLabel}</Text>
+						)} */}
 						<RNPickerSelect
 							placeholder={{
 								label: 'Select a week',
@@ -408,19 +430,27 @@ const ViewMetrics = () => {
 							items={weeklyItems}
 							value={weeklyLabel}
 							useNativeAndroidPickerStyle={false}
+							Icon={() => <AntDesign name='down' size={20} color='#D1D5DE' />}
+							style={pickerStyles}
 						/>
 					</View>
 
-					<View style={styles.row}>
+					<View style={styles.flexRow}>
+						<View style={styles.flexFillSm} />
 						<SummaryMetric title='Earnings' value={`$${weekly.amount}`} />
-						<SummaryMetric title='Hourly' value={`${weekly.hourly} /hr`} />
-						<SummaryMetric title='Hours' value={`${weekly.hours} hrs`} />
+						<View style={styles.flexFillSm} />
+						<SummaryMetric title='Hourly' value={weekly.hourly} />
+						<View style={styles.flexFillSm} />
+						<SummaryMetric title='Hours' value={weekly.hours} />
+						<View style={styles.flexFillSm} />
 					</View>
 				</View>
 
 				{/* Monthly */}
 				<View style={styles.summaryBlock}>
-					{/* <Text>{monthlyLabel}</Text> */}
+					{/* {Platform.OS === 'android' && (
+						<Text>{`${monthlyLabel} ${yearlyLabel}`}</Text>
+					)} */}
 					<RNPickerSelect
 						placeholder={{
 							label: 'Select a month',
@@ -430,16 +460,23 @@ const ViewMetrics = () => {
 						items={monthlyItems}
 						value={monthlyLabel}
 						useNativeAndroidPickerStyle={false}
+						Icon={() => <AntDesign name='down' size={20} color='#D1D5DE' />}
+						style={pickerStyles}
 					/>
-					<View style={styles.row}>
+					<View style={styles.flexRow}>
+						<View style={styles.flexFillSm} />
 						<SummaryMetric title='Earnings' value={`$${monthly.amount}`} />
-						<SummaryMetric title='Hourly' value={`${monthly.hourly} /hr`} />
-						<SummaryMetric title='Hours' value={`${monthly.hours} hrs`} />
+						<View style={styles.flexFillSm} />
+						<SummaryMetric title='Hourly' value={monthly.hourly} />
+						<View style={styles.flexFillSm} />
+						<SummaryMetric title='Hours' value={monthly.hours} />
+						<View style={styles.flexFillSm} />
 					</View>
 				</View>
 
 				{/* Yearly */}
 				<View style={styles.summaryBlock}>
+					{/* {Platform.OS === 'android' && <Text>{yearlyLabel}</Text>} */}
 					<RNPickerSelect
 						placeholder={{
 							label: 'Select a year',
@@ -449,11 +486,17 @@ const ViewMetrics = () => {
 						items={yearlyItems}
 						value={yearlyLabel}
 						useNativeAndroidPickerStyle={false}
+						Icon={() => <AntDesign name='down' size={20} color='#D1D5DE' />}
+						style={pickerStyles}
 					/>
-					<View style={styles.row}>
+					<View style={styles.flexRow}>
+						<View style={styles.flexFillSm} />
 						<SummaryMetric title='Earnings' value={`$${yearly.amount}`} />
-						<SummaryMetric title='Hourly' value={`${yearly.hourly} /hr`} />
-						<SummaryMetric title='Hours' value={`${yearly.hours} hrs`} />
+						<View style={styles.flexFillSm} />
+						<SummaryMetric title='Hourly' value={yearly.hourly} />
+						<View style={styles.flexFillSm} />
+						<SummaryMetric title='Hours' value={yearly.hours} />
+						<View style={styles.flexFillSm} />
 					</View>
 				</View>
 			</View>
@@ -465,26 +508,78 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: '#fff',
-		paddingLeft: 10,
-		paddingRight: 10,
+		paddingHorizontal: 10,
 	},
 	title: {
-		fontSize: 24,
+		fontSize: 16,
 		fontWeight: `500`,
+	},
+	flexRow: {
+		flexDirection: `row`,
+		marginBottom: Platform.OS === 'ios' ? 15 : 10,
+		paddingTop: 5,
+	},
+	flexFillLarge: {
+		flex: 2,
+	},
+	flexFillMed: {
+		flex: 1.5,
+	},
+	flexFillReg: {
+		flex: 1,
+	},
+	flexFillSm: {
+		flex: 0.5,
 	},
 	row: {
 		flexDirection: `row`,
 		justifyContent: `space-around`,
+		marginBottom: Platform.OS === 'ios' ? 15 : 10,
+		paddingTop: 5,
+	},
+	summaryRow: {
+		flexDirection: `row`,
+		justifyContent: `space-between`,
+		paddingHorizontal: 25,
+		marginBottom: Platform.OS === 'ios' ? 15 : 10,
+		paddingTop: 5,
 	},
 	summaryBlock: {
-		paddingLeft: 5,
-		paddingRight: 5,
-		paddingTop: 10,
-		paddingBottom: 10,
+		paddingTop: 5,
 	},
 	summaryButton: {
 		color: `#4392F1`,
 		marginBottom: 5,
+	},
+});
+
+const pickerStyles = StyleSheet.create({
+	inputIOS: {
+		marginHorizontal: 15,
+		fontSize: 14,
+		paddingVertical: 8,
+		paddingHorizontal: 5,
+		borderWidth: 1,
+		borderColor: 'gray',
+		borderRadius: 4,
+		color: 'black',
+		paddingRight: 30, // to ensure the text is never behind the icon
+		marginBottom: 2,
+		color: `gray`,
+	},
+	inputAndroid: {
+		fontSize: 16,
+		paddingHorizontal: 10,
+		paddingVertical: 8,
+		borderWidth: 0.5,
+		borderColor: 'gray',
+		borderRadius: 8,
+		color: 'black',
+		paddingRight: 30, // to ensure the text is never behind the icon
+	},
+	iconContainer: {
+		top: Platform.OS === 'ios' ? 8 : 12,
+		right: 30,
 	},
 });
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+	Platform,
 	View,
 	Text,
 	StyleSheet,
@@ -91,7 +92,11 @@ const EditShift = ({ shift, job, setEditModal, handleEditShift }) => {
 
 	return (
 		<View style={styles.container}>
-			<Text>{shift.createdAt}</Text>
+			{/* Date Row */}
+			<View style={styles.column}>
+				<Text style={styles.subtitle}>Date</Text>
+				<Text>{shift.createdAt}</Text>
+			</View>
 
 			{/* Amount and Position Inputs */}
 			<View style={styles.row}>
@@ -132,7 +137,7 @@ const EditShift = ({ shift, job, setEditModal, handleEditShift }) => {
 					/>
 				</View>
 			) : (
-				<View style={{ flexDirection: `row`, marginVertical: 20 }}>
+				<View style={styles.row}>
 					<View style={styles.itemInner}>
 						<Text style={styles.subtitle}>Clocked in</Text>
 						<TouchableOpacity onPress={showInTimePicker} style={styles.input}>
@@ -174,8 +179,8 @@ const EditShift = ({ shift, job, setEditModal, handleEditShift }) => {
 					flexDirection: `row`,
 					alignItems: `center`,
 					justifyContent: `flex-end`,
-					marginTop: 20,
-					marginBottom: 20,
+					marginTop: 10,
+					marginBottom: 10,
 					width: `100%`,
 				}}
 			>
@@ -216,7 +221,7 @@ const EditShift = ({ shift, job, setEditModal, handleEditShift }) => {
 			</View>
 
 			<Text>Tags</Text>
-			<SafeAreaView style={{ height: 80 }}>
+			<SafeAreaView style={{ height: 80, marginTop: 5 }}>
 				<ScrollView horizontal={true}>
 					{shift.tags.length !== 0 &&
 						_.map(shift.tags, (tag) => {
@@ -245,7 +250,7 @@ const EditShift = ({ shift, job, setEditModal, handleEditShift }) => {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 0.6,
+		flex: 0.75,
 		justifyContent: `space-between`,
 	},
 	tag: {
@@ -253,6 +258,9 @@ const styles = StyleSheet.create({
 		padding: 2,
 		borderRadius: 5,
 		marginRight: 5,
+	},
+	title: {
+		textAlign: `center`,
 	},
 	subtitle: {
 		fontWeight: 'bold',
@@ -279,6 +287,11 @@ const styles = StyleSheet.create({
 	row: {
 		width: `100%`,
 		flexDirection: `row`,
+		marginBottom: 15,
+	},
+	column: {
+		width: `100%`,
+		marginBottom: 15,
 	},
 	itemAlignLeft: {
 		justifyContent: 'flex-start',
