@@ -12,7 +12,11 @@ import moment from 'moment';
 import _ from 'lodash';
 
 import { listShifts, listJobs } from '../graphql/queries';
-import { onCreateShift } from '../graphql/subscriptions';
+import {
+	onCreateShift,
+	onDeleteShift,
+	onUpdateShift,
+} from '../graphql/subscriptions';
 import CalendarDetail from '../components/calendarDetail';
 /**
  * todo Fix app so shift data shows up when you switch to the tab
@@ -20,10 +24,11 @@ import CalendarDetail from '../components/calendarDetail';
  * 		? again to see the shift data
  */
 
-const ViewCalendar = () => {
+const ViewCalendar = ({ navigation }) => {
 	const [shifts, setShifts] = useState([]);
 	const [jobs, setJobs] = useState([]);
 	const [currentDetail, setCurrentDetail] = useState({});
+	const [currentDate, setCurrentDate] = useState('');
 
 	// fetch shifts when component mounts and shifts state updates
 	useEffect(() => {
@@ -33,23 +38,51 @@ const ViewCalendar = () => {
 		getJobs();
 	}, []);
 
-	// useEffect(() => {
-	// 	const onCreateSubscription = API.graphql(
-	// 		graphqlOperation(onCreateShift)
-	// 	).subscribe({
-	// 		next: (shiftData) => {
-	// 			const newShift = shiftData.value.data.onCreateShift;
-	// 			const prevShifts = shifts.filter((shift) => shift.id !== newShift.id);
-	// 			setShifts([...prevShifts, newShift]);
-	// 		},
-	// 	});
+	// onCreateSubscription - Listener
+	useEffect(() => {
+		const onCreateSubscription = API.graphql(
+			graphqlOperation(onCreateShift)
+		).subscribe({
+			// error: (err) => console.log('error caught', err),
+			error: (err) => {},
+			next: (shiftData) => {
+				const newShift = shiftData.value.data.onCreateShift;
+				console.log(`newShift: ${JSON.stringify(newShift)}`);
+				const prevShifts = shifts.filter((shift) => shift.id !== newShift.id);
+				console.log(`prevShifts.length: ${prevShifts.length}`);
+				setShifts([...prevShifts, newShift]);
+			},
+		});
+		return () => {
+			if (onCreateSubscription) {
+				onCreateSubscription.unsubscribe();
+			}
+		};
+	}, [shifts]);
 
-	// 	return () => {
-	// 		if (onCreateSubscription) {
-	// 			onCreateSubscription.unsubscribe();
-	// 		}
-	// 	};
-	// }, [shifts]);
+	// onDeleteSubscription - Listener
+	useEffect(() => {
+		const onDeleteSubscription = API.graphql(
+			graphqlOperation(onDeleteShift)
+		).subscribe({
+			// error: (err) => console.log('error caught', err),
+			error: (err) => {},
+			next: (shiftData) => {
+				const deletedShift = shiftData.value.data.onDeleteShift;
+				const updatedShifts = _.filter(
+					shifts,
+					(shift) => shift.id !== deletedShift.id
+				);
+				setShifts(updatedShifts);
+			},
+		});
+
+		return () => {
+			if (onDeleteSubscription) {
+				onDeleteSubscription.unsubscribe();
+			}
+		};
+	}, [shifts]);
 
 	// helper function - fetch shifts
 	const getShifts = async () => {
@@ -61,6 +94,19 @@ const ViewCalendar = () => {
 	const getJobs = async () => {
 		const result = await API.graphql(graphqlOperation(listJobs));
 		setJobs(result.data.listJobs.items);
+	};
+
+	// helper function - handle state for full cell selected
+	const handleFullDaySelected = (currentDetail, date) => {
+		setCurrentDetail({ ...currentDetail });
+		setCurrentDate(`${date.month}-${date.day}-${date.year}`);
+	};
+
+	// helper function - handle state for empty cell selected
+	const handleEmptyDaySelected = (date) => {
+		setCurrentDetail({});
+		setCurrentDate(moment(date.dateString, 'YYYY-MM-DD').format('L'));
+		console.log(`changing current date to ${date.dateString}`);
 	};
 
 	// renderDayComponent - find all shifts for each day and render amount + hourly
@@ -109,16 +155,18 @@ const ViewCalendar = () => {
 		}
 
 		return (
-			<View>
-				<Text
-					style={{
-						textAlign: 'left',
-						color: state === 'disabled' ? 'gray' : 'black',
-					}}
-				>
-					{date.day}
-				</Text>
-			</View>
+			<TouchableOpacity onPress={() => handleEmptyDaySelected(date)}>
+				<View style={{ height: 35, width: 35 }}>
+					<Text
+						style={{
+							textAlign: 'left',
+							color: state === 'disabled' ? 'gray' : 'black',
+						}}
+					>
+						{date.day}
+					</Text>
+				</View>
+			</TouchableOpacity>
 		);
 	};
 
@@ -130,6 +178,9 @@ const ViewCalendar = () => {
 					showWeekNumbers
 					hideExtraDays
 					style={{}}
+					theme={{
+						arrowColor: '#06D6A0',
+					}}
 					dayComponent={({ date, state }) => {
 						return renderDayComponent(date, state);
 					}}
@@ -141,7 +192,12 @@ const ViewCalendar = () => {
 			)}
 
 			{/* Calendar Detail */}
-			<CalendarDetail currentDetail={currentDetail} jobs={jobs} />
+			<CalendarDetail
+				currentDetail={currentDetail}
+				jobs={jobs}
+				currentDate={currentDate}
+				navigation={navigation}
+			/>
 		</View>
 	);
 };
