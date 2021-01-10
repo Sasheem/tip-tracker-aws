@@ -24,6 +24,7 @@ import ViewSettings from './src/screens/viewSettings';
 import Profile from './src/components/settingsProfile';
 import Jobs from './src/components/settingsJobs';
 import CreateJob from './src/components/createJob';
+import EditJob from './src/components/editJob';
 
 const RootStack = createStackNavigator();
 
@@ -38,6 +39,11 @@ const RootJobsScreen = ({ navigation }) => {
 			<RootStack.Screen
 				name='CreateJobModal'
 				component={CreateJob}
+				options={{ headerShown: false }}
+			/>
+			<RootStack.Screen
+				name='EditJob'
+				component={EditJob}
 				options={{ headerShown: false }}
 			/>
 		</RootStack.Navigator>
