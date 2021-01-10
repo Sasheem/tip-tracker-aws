@@ -332,7 +332,8 @@ const ViewMetrics = () => {
 
 	// helper function - set monthly
 	const setMonthlyValues = (value) => {
-		if (value) {
+		console.log(`value: ${value}`);
+		if (value !== null) {
 			setMonthlyLabel(value);
 			var monthlySplit = value.split(' ');
 			setMonthlyMonthLabel(monthlySplit[0]);
@@ -386,7 +387,6 @@ const ViewMetrics = () => {
 				<Text style={styles.title}>Summary</Text>
 				{/* Daily */}
 				<View style={styles.summaryBlock}>
-					{/* {Platform.OS === 'android' && <Text>{dailyLabel}</Text>} */}
 					<RNPickerSelect
 						placeholder={{
 							label: 'Select a day',
@@ -399,28 +399,27 @@ const ViewMetrics = () => {
 						Icon={() => <AntDesign name='down' size={20} color='#D1D5DE' />}
 						style={pickerStyles}
 					/>
-					<View style={styles.flexRow}>
-						<View style={styles.flexFillSm} />
-						<SummaryMetric title='Earnings' value={`$${daily.amount}`} />
-						<View style={styles.flexFillSm} />
-						<SummaryMetric
-							title='Hourly'
-							value={(
-								parseFloat(daily.amount) / parseFloat(daily.hours)
-							).toFixed(1)}
-						/>
-						<View style={styles.flexFillSm} />
-						<SummaryMetric title='Hours' value={daily.hours} />
-						<View style={styles.flexFillSm} />
-					</View>
+					{daily.hours && (
+						<View style={styles.flexRow}>
+							<View style={styles.flexFillSm} />
+							<SummaryMetric title='Earnings' value={`$${daily.amount}`} />
+							<View style={styles.flexFillSm} />
+							<SummaryMetric
+								title='Hourly'
+								value={(
+									parseFloat(daily.amount) / parseFloat(daily.hours)
+								).toFixed(1)}
+							/>
+							<View style={styles.flexFillSm} />
+							<SummaryMetric title='Hours' value={daily.hours} />
+							<View style={styles.flexFillSm} />
+						</View>
+					)}
 				</View>
 
 				{/* Weekly */}
 				<View style={styles.summaryBlock}>
 					<View>
-						{/* {Platform.OS === 'android' && (
-							<Text style={styles.summaryButton}>Week {weeklyLabel}</Text>
-						)} */}
 						<RNPickerSelect
 							placeholder={{
 								label: 'Select a week',
@@ -435,22 +434,21 @@ const ViewMetrics = () => {
 						/>
 					</View>
 
-					<View style={styles.flexRow}>
-						<View style={styles.flexFillSm} />
-						<SummaryMetric title='Earnings' value={`$${weekly.amount}`} />
-						<View style={styles.flexFillSm} />
-						<SummaryMetric title='Hourly' value={weekly.hourly} />
-						<View style={styles.flexFillSm} />
-						<SummaryMetric title='Hours' value={weekly.hours} />
-						<View style={styles.flexFillSm} />
-					</View>
+					{weekly.hours && (
+						<View style={styles.flexRow}>
+							<View style={styles.flexFillSm} />
+							<SummaryMetric title='Earnings' value={`$${weekly.amount}`} />
+							<View style={styles.flexFillSm} />
+							<SummaryMetric title='Hourly' value={weekly.hourly} />
+							<View style={styles.flexFillSm} />
+							<SummaryMetric title='Hours' value={weekly.hours} />
+							<View style={styles.flexFillSm} />
+						</View>
+					)}
 				</View>
 
 				{/* Monthly */}
 				<View style={styles.summaryBlock}>
-					{/* {Platform.OS === 'android' && (
-						<Text>{`${monthlyLabel} ${yearlyLabel}`}</Text>
-					)} */}
 					<RNPickerSelect
 						placeholder={{
 							label: 'Select a month',
@@ -463,20 +461,21 @@ const ViewMetrics = () => {
 						Icon={() => <AntDesign name='down' size={20} color='#D1D5DE' />}
 						style={pickerStyles}
 					/>
-					<View style={styles.flexRow}>
-						<View style={styles.flexFillSm} />
-						<SummaryMetric title='Earnings' value={`$${monthly.amount}`} />
-						<View style={styles.flexFillSm} />
-						<SummaryMetric title='Hourly' value={monthly.hourly} />
-						<View style={styles.flexFillSm} />
-						<SummaryMetric title='Hours' value={monthly.hours} />
-						<View style={styles.flexFillSm} />
-					</View>
+					{monthly.hourly && monthly.hourly !== NaN && (
+						<View style={styles.flexRow}>
+							<View style={styles.flexFillSm} />
+							<SummaryMetric title='Earnings' value={`$${monthly.amount}`} />
+							<View style={styles.flexFillSm} />
+							<SummaryMetric title='Hourly' value={monthly.hourly} />
+							<View style={styles.flexFillSm} />
+							<SummaryMetric title='Hours' value={monthly.hours} />
+							<View style={styles.flexFillSm} />
+						</View>
+					)}
 				</View>
 
 				{/* Yearly */}
 				<View style={styles.summaryBlock}>
-					{/* {Platform.OS === 'android' && <Text>{yearlyLabel}</Text>} */}
 					<RNPickerSelect
 						placeholder={{
 							label: 'Select a year',
@@ -489,15 +488,17 @@ const ViewMetrics = () => {
 						Icon={() => <AntDesign name='down' size={20} color='#D1D5DE' />}
 						style={pickerStyles}
 					/>
-					<View style={styles.flexRow}>
-						<View style={styles.flexFillSm} />
-						<SummaryMetric title='Earnings' value={`$${yearly.amount}`} />
-						<View style={styles.flexFillSm} />
-						<SummaryMetric title='Hourly' value={yearly.hourly} />
-						<View style={styles.flexFillSm} />
-						<SummaryMetric title='Hours' value={yearly.hours} />
-						<View style={styles.flexFillSm} />
-					</View>
+					{yearly.hours && (
+						<View style={styles.flexRow}>
+							<View style={styles.flexFillSm} />
+							<SummaryMetric title='Earnings' value={`$${yearly.amount}`} />
+							<View style={styles.flexFillSm} />
+							<SummaryMetric title='Hourly' value={yearly.hourly} />
+							<View style={styles.flexFillSm} />
+							<SummaryMetric title='Hours' value={yearly.hours} />
+							<View style={styles.flexFillSm} />
+						</View>
+					)}
 				</View>
 			</View>
 		</View>
