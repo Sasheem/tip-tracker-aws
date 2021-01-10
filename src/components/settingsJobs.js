@@ -5,20 +5,46 @@ import {
 	View,
 	ActivityIndicator,
 	TouchableOpacity,
+	Modal,
 } from 'react-native';
 import { API, graphqlOperation } from 'aws-amplify';
 import { AntDesign } from '@expo/vector-icons';
 import _ from 'lodash';
 
 import { listJobs } from '../graphql/queries';
+import { onCreateJob } from '../graphql/subscriptions';
+import EditJob from './editJob';
 
 const SettingsJobs = ({ navigation }) => {
 	const [jobs, setJobs] = useState([]);
+	const [deleteModal, setDeleteModal] = useState(false);
+	const [editModal, setEditModal] = useState(false);
 
 	useEffect(() => {
 		console.log(`fetching jobs`);
 		getJobs();
 	}, []);
+
+	// onCreateJob listener, update jobs with newly added job
+	useEffect(() => {
+		const onCreateSubscription = API.graphql(
+			graphqlOperation(onCreateJob)
+		).subscribe({
+			// error: (err) => console.log('error caught', err),
+			error: (err) => {},
+			next: (jobData) => {
+				const newJob = jobData.value.data.onCreateJob;
+				const prevJobs = _.filter(jobs, (job) => job.id !== newJob.id);
+				setJobs([...prevJobs, newJob]);
+			},
+		});
+
+		return () => {
+			if (onCreateSubscription) {
+				onCreateSubscription.unsubscribe();
+			}
+		};
+	}, [jobs]);
 
 	// fetch jobs
 	const getJobs = async () => {
@@ -28,12 +54,12 @@ const SettingsJobs = ({ navigation }) => {
 
 	return (
 		<View style={styles.container}>
-			<Text>Jobs</Text>
 			<View style={styles.tableHead}>
+				<View style={styles.tableFiller} />
 				<Text style={styles.tableText}>Title</Text>
 				<Text style={styles.tableText}>Wage</Text>
 				<Text style={styles.tableText}>Store</Text>
-				<View />
+				<View style={styles.tableFiller} />
 			</View>
 			<View style={styles.tableBody}>
 				{jobs.length !== 0 ? (
@@ -41,7 +67,7 @@ const SettingsJobs = ({ navigation }) => {
 						<TouchableOpacity
 							key={job.id}
 							style={styles.jobs}
-							onPress={() => console.log('show modal with data to edit job')}
+							onPress={() => navigation.navigate('EditJob', { job })}
 						>
 							<Text style={styles.tableText}>{job.jobTitle}</Text>
 							<Text style={styles.tableText}>{job.jobWage}</Text>
@@ -83,8 +109,6 @@ const styles = StyleSheet.create({
 		zIndex: 3,
 	},
 	tableHead: {
-		paddingLeft: 5,
-		paddingRight: 5,
 		paddingBottom: 10,
 		flex: 0.25,
 		flexDirection: `row`,
@@ -95,10 +119,13 @@ const styles = StyleSheet.create({
 	},
 	tableBody: {
 		flex: 2,
-		justifyContent: `flex-start`,
 	},
 	tableText: {
 		textAlign: `left`,
+		flex: 1,
+	},
+	tableFiller: {
+		flex: 0.1,
 	},
 	jobs: {
 		paddingLeft: 5,
@@ -113,7 +140,7 @@ const styles = StyleSheet.create({
 	},
 	addButton: {
 		borderRadius: 50,
-		backgroundColor: `lightblue`,
+		backgroundColor: `#06D6A0`,
 		padding: 8,
 		shadowColor: '#000',
 		shadowOffset: {

@@ -4,13 +4,14 @@ import {
 	StyleSheet,
 	View,
 	Text,
+	TextInput,
 	TouchableOpacity,
 	KeyboardAvoidingView,
 	Keyboard,
 	TouchableWithoutFeedback,
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import { ScrollView, TextInput } from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
 import { API, graphqlOperation } from 'aws-amplify';
 
 import { createJob } from '../graphql/mutations';
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
 	},
 	btn: {
 		padding: 10,
-		backgroundColor: `lightblue`,
+		backgroundColor: `#06D6A0`,
 		alignItems: `center`,
 		borderRadius: 2.5,
 	},
