@@ -40,9 +40,10 @@ import ShiftTag from '../components/shiftTag';
  * todo remove tag from state when its corresponding delete button is pressed
  * todo replace Picker with RNPickerSelect
  * 		? check versus the month and year to see why the label issue is happening
+ * todo needs to handle case where no data was input at all
  */
 
-const CreateShift = () => {
+const CreateShift = ({ route }) => {
 	// state
 	const [date, setDate] = useState(moment().format('L'));
 	const [amount, setAmount] = useState('');
@@ -61,6 +62,14 @@ const CreateShift = () => {
 	const [isOutTimePickerVisible, setOutTimePickerVisibility] = useState(false);
 	const [tagError, setTagError] = useState('');
 	const [formError, setFormError] = useState('');
+
+	// load date from route
+	useEffect(() => {
+		if (!_.isEmpty(route.params)) {
+			console.log(`route.params: ${JSON.stringify(route.params)}`);
+			route.params.currentDate !== '' && setDate(route.params.currentDate);
+		}
+	}, [route.params]);
 
 	// handle removing tag from state
 	useEffect(() => {
@@ -217,9 +226,6 @@ const CreateShift = () => {
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 				<ScrollView>
 					<View style={styles.inner}>
-						{/* Title */}
-						{/* <Text style={styles.title}>Add a shift</Text> */}
-
 						{/* Date */}
 						<View
 							style={{
@@ -232,14 +238,14 @@ const CreateShift = () => {
 							<AntDesign
 								name='left'
 								size={28}
-								color='black'
+								color='#06D6A0'
 								onPress={handleDateBackward}
 							/>
 							<Text style={{ fontSize: 24 }}>{date}</Text>
 							<AntDesign
 								name='right'
 								size={28}
-								color='black'
+								color='#06D6A0'
 								onPress={handleDateForward}
 							/>
 						</View>
@@ -248,15 +254,11 @@ const CreateShift = () => {
 						<View style={[styles.row2x, { marginBottom: 20 }]}>
 							{/* Amount Earned */}
 							<View style={styles.rowComponent}>
-								<Text style={styles.subtitle}>Amount earned</Text>
+								<Text style={styles.subtitle}>Earnings</Text>
 								<TextInput
 									placeholder='$0.00'
 									keyboardType='decimal-pad'
-									style={
-										Platform.OS === 'ios'
-											? [styles.earningsIOS, styles.input]
-											: styles.earningsAndroid
-									}
+									style={[styles.earningsIOS, styles.input]}
 									onChangeText={(text) => onAmountChange(text)}
 									value={amount}
 									returnKeyType='done'
@@ -266,14 +268,21 @@ const CreateShift = () => {
 
 							{/* Position Worked */}
 							<View style={styles.rowComponent}>
-								<Text style={styles.subtitle}>Select position</Text>
-								<View style={styles.input}>
-									<RNPickerSelect
-										onValueChange={(value) => setJob(value)}
-										items={jobItems}
-										value={job}
-									/>
-								</View>
+								<Text style={styles.subtitle}>Position</Text>
+								<RNPickerSelect
+									placeholder={{
+										label: 'Pick job',
+										value: null,
+									}}
+									onValueChange={(value) => setJob(value)}
+									items={jobItems}
+									value={job}
+									useNativeAndroidPickerStyle={false}
+									Icon={() => (
+										<AntDesign name='down' size={16} color='#D1D5DE' />
+									)}
+									style={pickerStyles}
+								/>
 							</View>
 						</View>
 
@@ -281,7 +290,7 @@ const CreateShift = () => {
 						<View style={{ marginBottom: 20 }}>
 							{hoursToggled ? (
 								<View>
-									<Text style={styles.subtitle}>Hours worked</Text>
+									<Text style={styles.subtitle}>Hours</Text>
 									<TextInput
 										placeholder='4.5'
 										// autoFocus={true}
@@ -298,7 +307,7 @@ const CreateShift = () => {
 							) : (
 								<View style={{ flexDirection: `row`, marginBottom: 20 }}>
 									<View style={styles.rowComponent}>
-										<Text style={styles.subtitle}>Clocked in</Text>
+										<Text style={styles.subtitle}>In Time</Text>
 										<TouchableOpacity
 											onPress={showInTimePicker}
 											style={styles.input}
@@ -306,7 +315,7 @@ const CreateShift = () => {
 											<Text>
 												{inTime !== ''
 													? moment(inTime).format('hh:mm a')
-													: 'In Time'}
+													: 'Select time'}
 											</Text>
 										</TouchableOpacity>
 										<DateTimePickerModal
@@ -318,7 +327,7 @@ const CreateShift = () => {
 									</View>
 									<View style={styles.rowFiller} />
 									<View style={styles.rowComponent}>
-										<Text style={styles.subtitle}>Clocked out</Text>
+										<Text style={styles.subtitle}>Out Time</Text>
 										<TouchableOpacity
 											onPress={showOutTimePicker}
 											style={styles.input}
@@ -326,7 +335,7 @@ const CreateShift = () => {
 											<Text>
 												{outTime !== ''
 													? moment(outTime).format('hh:mm a')
-													: 'Out Time'}
+													: 'Select time'}
 											</Text>
 										</TouchableOpacity>
 										<DateTimePickerModal
@@ -349,7 +358,7 @@ const CreateShift = () => {
 									width: `100%`,
 								}}
 							>
-								<Text>Hours</Text>
+								<Text style={{ marginRight: 10 }}>Hours</Text>
 								<Switch
 									trackColor={{ false: '#767577', true: '#81b0ff' }}
 									thumbColor={hoursToggled ? '#f5dd4b' : '#f4f3f4'}
@@ -362,7 +371,7 @@ const CreateShift = () => {
 
 						{/* Form Row: Shift Tags */}
 						<View>
-							<Text style={styles.subtitle}>Add Shift Tags</Text>
+							<Text style={styles.subtitle}>Add tag</Text>
 							<View
 								style={[
 									{ flexDirection: `row`, marginBottom: 10 },
@@ -383,7 +392,7 @@ const CreateShift = () => {
 									}}
 								>
 									<TouchableOpacity onPress={handleCreateTag}>
-										<AntDesign name='plus' size={24} color='blue' />
+										<AntDesign name='plus' size={24} color='#B3BAC9' />
 									</TouchableOpacity>
 								</View>
 							</View>
@@ -412,23 +421,17 @@ const CreateShift = () => {
 						<View style={styles.btnContainer}>
 							<TouchableOpacity
 								onPress={handleSubmit}
-								style={{
-									padding: 10,
-									backgroundColor: `lightblue`,
-									alignItems: `center`,
-									borderRadius: 2.5,
-								}}
+								style={styles.buttonSubmit}
 							>
-								<Text>Add</Text>
+								<Text style={styles.buttonText}>Add</Text>
 							</TouchableOpacity>
 						</View>
+
+						{/* Form  Error Message */}
 						{formError !== '' && (
 							<Text style={{ color: `red` }}>{formError}</Text>
 						)}
 
-						{/* <View style={styles.btnContainer}>
-							<Button title='Submit' onPress={() => null} />
-						</View> */}
 						<View style={styles.hardFiller} />
 					</View>
 				</ScrollView>
@@ -467,8 +470,18 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		marginBottom: 36,
 	},
+	buttonText: {
+		color: `white`,
+		fontSize: 16,
+		fontWeight: `500`,
+	},
+	buttonSubmit: {
+		padding: 10,
+		backgroundColor: `#06D6A0`,
+		alignItems: `center`,
+		borderRadius: 2.5,
+	},
 	earningsIOS: { fontSize: 16 },
-	earningsAndroid: { height: 50 },
 	btnContainer: {
 		marginTop: 12,
 	},
@@ -482,33 +495,40 @@ const styles = StyleSheet.create({
 		flex: 0.1,
 	},
 	input: {
-		borderWidth: 1,
-		borderColor: `#A2A7A5`,
+		borderWidth: 0.5,
+		borderColor: `#B3BAC9`,
 		borderRadius: 5,
-		paddingTop: 10,
-		paddingLeft: 10,
-		paddingRight: 10,
-		paddingBottom: 10,
+		paddingHorizontal: 10,
+		paddingVertical: 8,
 	},
+});
+
+const pickerStyles = StyleSheet.create({
 	inputIOS: {
 		fontSize: 16,
-		paddingVertical: 12,
 		paddingHorizontal: 10,
-		borderWidth: 1,
-		borderColor: 'gray',
-		borderRadius: 4,
+		paddingVertical: 8,
+		borderWidth: 0.5,
+		borderColor: '#B3BAC9',
+		borderRadius: 6,
 		color: 'black',
 		paddingRight: 30, // to ensure the text is never behind the icon
+		marginBottom: 2,
+		color: `gray`,
 	},
 	inputAndroid: {
 		fontSize: 16,
 		paddingHorizontal: 10,
 		paddingVertical: 8,
 		borderWidth: 0.5,
-		borderColor: 'purple',
-		borderRadius: 8,
+		borderColor: '#B3BAC9',
+		borderRadius: 6,
 		color: 'black',
 		paddingRight: 30, // to ensure the text is never behind the icon
+	},
+	iconContainer: {
+		top: Platform.OS === 'ios' ? 10 : 15,
+		right: Platform.OS === 'ios' ? 15 : 10,
 	},
 });
 
