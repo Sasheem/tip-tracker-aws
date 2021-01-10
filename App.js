@@ -7,6 +7,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Amplify from 'aws-amplify';
 import config from './aws-exports';
 import { withAuthenticator } from 'aws-amplify-react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 // not using Analytics but prior to disabling it was causing a warning
 Amplify.configure({
@@ -60,7 +61,31 @@ const Tab = createBottomTabNavigator();
 const App = () => {
 	return (
 		<NavigationContainer>
-			<Tab.Navigator>
+			<Tab.Navigator
+				screenOptions={({ route }) => ({
+					tabBarIcon: ({ color }) => {
+						let iconName;
+
+						if (route.name === 'Shift') {
+							iconName = `md-add`;
+						} else if (route.name === 'Calendar') {
+							iconName = `md-calendar`;
+						} else if (route.name === 'Metrics') {
+							iconName = `md-stats`;
+						} else if (route.name === 'Settings') {
+							iconName = `md-settings`;
+						}
+
+						return <Ionicons name={iconName} size={25} color={color} />;
+					},
+				})}
+				tabBarOptions={{
+					activeTintColor: '#06D6A0',
+					inactiveTintColor: 'gray',
+					showLabel: false,
+					showIcon: true,
+				}}
+			>
 				<Tab.Screen name='Shift' component={CreateShift} />
 				<Tab.Screen name='Calendar' component={ViewCalendar} />
 				<Tab.Screen name='Metrics' component={ViewMetrics} />
