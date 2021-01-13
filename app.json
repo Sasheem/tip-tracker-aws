@@ -4,11 +4,11 @@
     "slug": "tip-tracker-aws",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon-grey.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash-grey.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#06C8D5"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
