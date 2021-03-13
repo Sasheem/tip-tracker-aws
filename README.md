@@ -16,7 +16,7 @@
 
 ## Screens
 <p float="left">
-    <img src="https://user-images.githubusercontent.com/29101666/111042548-dfd95100-840b-11eb-925c-c8a08527afb4.png" alt="view add mockup" width="200">
-    <img src="https://user-images.githubusercontent.com/29101666/111042549-e10a7e00-840b-11eb-8cd9-909ee4c5d01a.png" alt="view shifts mockup" width="200">
-    <img src="https://user-images.githubusercontent.com/29101666/111042550-e2d44180-840b-11eb-9249-b52c22e04fd6.png" alt="view metrics mockup" width="200">
+    <img src="https://user-images.githubusercontent.com/29101666/111042548-dfd95100-840b-11eb-925c-c8a08527afb4.png" alt="view add mockup" width="250">
+    <img src="https://user-images.githubusercontent.com/29101666/111042549-e10a7e00-840b-11eb-8cd9-909ee4c5d01a.png" alt="view shifts mockup" width="250">
+    <img src="https://user-images.githubusercontent.com/29101666/111042550-e2d44180-840b-11eb-9249-b52c22e04fd6.png" alt="view metrics mockup" width="250">
 </p>
