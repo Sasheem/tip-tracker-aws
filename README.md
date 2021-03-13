@@ -13,3 +13,8 @@
     <li>Lodash JS</li>
     <li>Moment JS</li>
 </ul>
+
+## Screens
+![Alt add screen](/assets/view-add-mockup.jpg?raw=true "Add Screen")
+![Alt shifts sreen](/assets/view-shifts-mockup.jpg?raw=true "Shifts Screen")
+![Alt metrics screen](/assets/view-metrics-mockup.jpg?raw=true "Metrics Screen")
