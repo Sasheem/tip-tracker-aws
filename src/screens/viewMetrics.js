@@ -508,8 +508,7 @@ const styles = StyleSheet.create({
 	},
 	headerText: {
 		fontSize: 40,
-		paddingTop: 48,
-		paddingBottom: 24,
+		// paddingBottom: 24,
 		textAlign: `left`,
 	},
 	title: {
