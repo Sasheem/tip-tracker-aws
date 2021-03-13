@@ -15,6 +15,6 @@
 </ul>
 
 ## Screens
-![view-add-mockup](https://user-images.githubusercontent.com/29101666/111042373-1793c900-840b-11eb-84a7-ad2efe4c3f26.png)
-![view-shifts-mockup](https://user-images.githubusercontent.com/29101666/111042380-1cf11380-840b-11eb-9985-dc8c15749e16.png)
-![view-metrics-mockup](https://user-images.githubusercontent.com/29101666/111042383-1f536d80-840b-11eb-91df-82499dc66c9e.png)
+![view-add-mockup](https://user-images.githubusercontent.com/29101666/111042548-dfd95100-840b-11eb-925c-c8a08527afb4.png)
+![view-shifts-mockup](https://user-images.githubusercontent.com/29101666/111042549-e10a7e00-840b-11eb-8cd9-909ee4c5d01a.png)
+![view-metrics-mockup](https://user-images.githubusercontent.com/29101666/111042550-e2d44180-840b-11eb-9249-b52c22e04fd6.png)
