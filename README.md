@@ -15,6 +15,6 @@
 </ul>
 
 ## Screens
-![Alt add screen](/assets/view-add-mockup.jpg?raw=true "Add Screen")
-![Alt shifts sreen](/assets/view-shifts-mockup.jpg?raw=true "Shifts Screen")
-![Alt metrics screen](/assets/view-metrics-mockup.jpg?raw=true "Metrics Screen")
+![Alt add screen](https://raw.github.com/Sasheem/tip-tracker-aws/master/assets/view-add-mockup.jpg?raw=true "Add Screen")
+![Alt shifts sreen](https://raw.github.com/Sasheem/tip-tracker-aws/master/assets/view-shifts-mockup.jpg?raw=true "Shifts Screen")
+![Alt metrics screen](https://raw.github.com/Sasheem/tip-tracker-aws/master/assets/view-metrics-mockup.jpg?raw=true "Metrics Screen")
