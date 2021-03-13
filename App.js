@@ -92,9 +92,9 @@ const App = () => {
 					showIcon: true,
 				}}
 			>
-				<Tab.Screen name='Shift' component={CreateShift} />
-				<Tab.Screen name='Calendar' component={ViewCalendar} />
-				<Tab.Screen name='Metrics' component={ViewMetrics} />
+				<Tab.Screen name='Shift' component={CreateShift} options={{ tabBarLabel: 'Add' }} />
+				<Tab.Screen name='Calendar' component={ViewCalendar} options={{ title: 'Calendar' }} />
+				<Tab.Screen name='Metrics' component={ViewMetrics} options={{ title: 'Metrics' }} />
 				<Tab.Screen name='Settings' component={SettingsStackScreen} />
 			</Tab.Navigator>
 		</NavigationContainer>
