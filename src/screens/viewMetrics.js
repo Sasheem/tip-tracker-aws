@@ -82,6 +82,9 @@ const ViewMetrics = () => {
 		setDailyItems(daily);
 	}, [shifts]);
 
+	/**
+	 * todo pair the corresponding date range in the week label
+	 */
 	// set up weekly items array for RNPickerSelect
 	useEffect(() => {
 		var weekly = [];
@@ -107,7 +110,6 @@ const ViewMetrics = () => {
 				}
 			});
 		}
-		console.log(`weekly: ${JSON.stringify(weekly)}`);
 		setWeeklyItems(weekly);
 	}, [shifts]);
 
@@ -343,11 +345,12 @@ const ViewMetrics = () => {
 
 	return (
 		<View style={styles.container}>
+			<Text style={styles.headerText}>Shift metrics</Text>
 			{/* Top metrics */}
 			<View>
 				{/* Top Row */}
 				<Text style={styles.title}>Top Metrics</Text>
-				<View style={[styles.flexRow, { paddingHorizontal: 10 }]}>
+				<View style={styles.flexRow}>
 					<MetricComponent
 						title='Earnings'
 						value={`$${topAmount.amount}`}
@@ -369,7 +372,7 @@ const ViewMetrics = () => {
 
 				{/* Lifetime Row */}
 				<Text style={styles.title}>Lifetime Metrics</Text>
-				<View style={[styles.flexRow, { paddingHorizontal: 10 }]}>
+				<View style={styles.flexRow}>
 					<MetricComponent
 						title='Earnings'
 						value={`$${lifetime.amount}`}
@@ -401,7 +404,6 @@ const ViewMetrics = () => {
 					/>
 					{daily.hours && (
 						<View style={styles.flexRow}>
-							<View style={styles.flexFillSm} />
 							<SummaryMetric title='Earnings' value={`$${daily.amount}`} />
 							<View style={styles.flexFillSm} />
 							<SummaryMetric
@@ -412,7 +414,6 @@ const ViewMetrics = () => {
 							/>
 							<View style={styles.flexFillSm} />
 							<SummaryMetric title='Hours' value={daily.hours} />
-							<View style={styles.flexFillSm} />
 						</View>
 					)}
 				</View>
@@ -436,13 +437,11 @@ const ViewMetrics = () => {
 
 					{weekly.hours && (
 						<View style={styles.flexRow}>
-							<View style={styles.flexFillSm} />
 							<SummaryMetric title='Earnings' value={`$${weekly.amount}`} />
 							<View style={styles.flexFillSm} />
 							<SummaryMetric title='Hourly' value={weekly.hourly} />
 							<View style={styles.flexFillSm} />
 							<SummaryMetric title='Hours' value={weekly.hours} />
-							<View style={styles.flexFillSm} />
 						</View>
 					)}
 				</View>
@@ -463,13 +462,11 @@ const ViewMetrics = () => {
 					/>
 					{monthly.hourly && monthly.hourly !== NaN && (
 						<View style={styles.flexRow}>
-							<View style={styles.flexFillSm} />
 							<SummaryMetric title='Earnings' value={`$${monthly.amount}`} />
 							<View style={styles.flexFillSm} />
 							<SummaryMetric title='Hourly' value={monthly.hourly} />
 							<View style={styles.flexFillSm} />
 							<SummaryMetric title='Hours' value={monthly.hours} />
-							<View style={styles.flexFillSm} />
 						</View>
 					)}
 				</View>
@@ -490,13 +487,11 @@ const ViewMetrics = () => {
 					/>
 					{yearly.hours && (
 						<View style={styles.flexRow}>
-							<View style={styles.flexFillSm} />
 							<SummaryMetric title='Earnings' value={`$${yearly.amount}`} />
 							<View style={styles.flexFillSm} />
 							<SummaryMetric title='Hourly' value={yearly.hourly} />
 							<View style={styles.flexFillSm} />
 							<SummaryMetric title='Hours' value={yearly.hours} />
-							<View style={styles.flexFillSm} />
 						</View>
 					)}
 				</View>
@@ -509,7 +504,13 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: '#fff',
-		paddingHorizontal: 10,
+		paddingHorizontal: 24,
+	},
+	headerText: {
+		fontSize: 40,
+		paddingTop: 48,
+		paddingBottom: 24,
+		textAlign: `left`,
 	},
 	title: {
 		fontSize: 16,
@@ -556,10 +557,9 @@ const styles = StyleSheet.create({
 
 const pickerStyles = StyleSheet.create({
 	inputIOS: {
-		marginHorizontal: 15,
 		fontSize: 14,
 		paddingVertical: 8,
-		paddingHorizontal: 5,
+		paddingHorizontal: 10,
 		borderWidth: 1,
 		borderColor: 'gray',
 		borderRadius: 4,
@@ -580,7 +580,7 @@ const pickerStyles = StyleSheet.create({
 	},
 	iconContainer: {
 		top: Platform.OS === 'ios' ? 8 : 12,
-		right: 30,
+		right: 15,
 	},
 });
 

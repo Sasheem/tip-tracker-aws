@@ -172,6 +172,7 @@ const ViewCalendar = ({ navigation }) => {
 
 	return (
 		<View style={styles.container}>
+			<Text style={styles.headerText}>View shifts</Text>
 			{/* Calendar Component */}
 			{shifts.length !== 0 ? (
 				<Calendar
@@ -220,6 +221,13 @@ const styles = StyleSheet.create({
 	cellText: {
 		fontSize: 11,
 		textAlign: `center`,
+	},
+	headerText: {
+		fontSize: 40,
+		paddingLeft: 24,
+		paddingTop: 48,
+		paddingBottom: 24,
+		textAlign: `left`,
 	},
 });
 

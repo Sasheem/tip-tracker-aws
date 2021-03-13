@@ -225,6 +225,7 @@ const CreateShift = ({ route }) => {
 		>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 				<ScrollView>
+					<Text style={styles.headerText}>Add shift</Text>
 					<View style={styles.inner}>
 						{/* Date */}
 						<View
@@ -451,6 +452,13 @@ const styles = StyleSheet.create({
 		padding: 24,
 		flex: 1,
 		justifyContent: `space-evenly`,
+	},
+	headerText: {
+		fontSize: 40,
+		paddingLeft: 24,
+		paddingTop: 48,
+		paddingBottom: 24,
+		textAlign: `left`,
 	},
 	title: {
 		fontSize: 32,
