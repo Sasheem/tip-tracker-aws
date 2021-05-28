@@ -172,7 +172,6 @@ const ViewCalendar = ({ navigation }) => {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.headerText}>View shifts</Text>
 			{/* Calendar Component */}
 			{shifts.length !== 0 ? (
 				<Calendar

@@ -345,7 +345,6 @@ const ViewMetrics = () => {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.headerText}>Shift metrics</Text>
 			{/* Top metrics */}
 			<View>
 				{/* Top Row */}
