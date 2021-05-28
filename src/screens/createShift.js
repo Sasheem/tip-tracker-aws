@@ -25,6 +25,7 @@ import { listJobs } from '../graphql/queries';
 import RNPickerSelect from 'react-native-picker-select';
 
 import ShiftTag from '../components/shiftTag';
+import Input from '../components/common/input'
 
 /**
  * todo add functionality to arrow buttons to modify date label DONE
@@ -254,14 +255,14 @@ const CreateShift = ({ route }) => {
 						<View style={[styles.row2x, { marginBottom: 20 }]}>
 							{/* Amount Earned */}
 							<View style={styles.rowComponent}>
-								<Text style={styles.subtitle}>Earnings</Text>
-								<TextInput
-									placeholder='$0.00'
-									keyboardType='decimal-pad'
-									style={[styles.earningsIOS, styles.input]}
-									onChangeText={(text) => onAmountChange(text)}
-									value={amount}
-									returnKeyType='done'
+								<Input 
+									label='Earnings' 
+									placeholder='$0.00' 
+									customInputStyle={styles.earningsIOS} 
+									onChangeText={(text) => onAmountChange(text)} 
+									value={amount} 
+									keyboardType='decimal-pad' 
+									returnKeyType='done' 
 								/>
 							</View>
 							<View style={styles.rowFiller} />
@@ -332,18 +333,18 @@ const CreateShift = ({ route }) => {
 							</View>
 							) : (
 								<View>
-									<Text style={styles.subtitle}>Hours</Text>
-									<TextInput
+									<Input
+										label='Hours' 
 										placeholder='4.5'
-										// autoFocus={true}
-										keyboardType='decimal-pad'
-										style={
+										customInputStyle={
 											Platform.OS === 'ios'
-												? [styles.earningsIOS, styles.input]
-												: styles.earningsAndroid
+											? styles.earningsIOS
+											: styles.earningsAndroid
 										}
 										onChangeText={(text) => onHoursChange(text)}
 										value={hours}
+										keyboardType='decimal-pad'
+										returnKeyType='done'
 									/>
 								</View>
 							)}
@@ -448,7 +449,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	inner: {
-		paddingTop: 48,
+		paddingTop: 24,
 		paddingLeft: 48,
 		paddingRight: 48,
 		flex: 1,
