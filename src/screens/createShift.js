@@ -225,7 +225,6 @@ const CreateShift = ({ route }) => {
 		>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 				<ScrollView>
-					<Text style={styles.headerText}>Add shift</Text>
 					<View style={styles.inner}>
 						{/* Date */}
 						<View
@@ -290,6 +289,48 @@ const CreateShift = ({ route }) => {
 						{/* Hours Worked */}
 						<View style={{ marginBottom: 20 }}>
 							{hoursToggled ? (
+								<View style={{ flexDirection: `row`, marginBottom: 20 }}>
+								<View style={styles.rowComponent}>
+									<Text style={styles.subtitle}>In Time</Text>
+									<TouchableOpacity
+										onPress={showInTimePicker}
+										style={styles.input}
+									>
+										<Text>
+											{inTime !== ''
+												? moment(inTime).format('hh:mm a')
+												: 'Select time'}
+										</Text>
+									</TouchableOpacity>
+									<DateTimePickerModal
+										isVisible={isInTimePickerVisible}
+										mode='time'
+										onConfirm={handleInTimeConfirm}
+										onCancel={hideInTimePicker}
+									/>
+								</View>
+								<View style={styles.rowFiller} />
+								<View style={styles.rowComponent}>
+									<Text style={styles.subtitle}>Out Time</Text>
+									<TouchableOpacity
+										onPress={showOutTimePicker}
+										style={styles.input}
+									>
+										<Text>
+											{outTime !== ''
+												? moment(outTime).format('hh:mm a')
+												: 'Select time'}
+										</Text>
+									</TouchableOpacity>
+									<DateTimePickerModal
+										isVisible={isOutTimePickerVisible}
+										mode='time'
+										onConfirm={handleOutTimeConfirm}
+										onCancel={hideOutTimePicker}
+									/>
+								</View>
+							</View>
+							) : (
 								<View>
 									<Text style={styles.subtitle}>Hours</Text>
 									<TextInput
@@ -305,48 +346,6 @@ const CreateShift = ({ route }) => {
 										value={hours}
 									/>
 								</View>
-							) : (
-								<View style={{ flexDirection: `row`, marginBottom: 20 }}>
-									<View style={styles.rowComponent}>
-										<Text style={styles.subtitle}>In Time</Text>
-										<TouchableOpacity
-											onPress={showInTimePicker}
-											style={styles.input}
-										>
-											<Text>
-												{inTime !== ''
-													? moment(inTime).format('hh:mm a')
-													: 'Select time'}
-											</Text>
-										</TouchableOpacity>
-										<DateTimePickerModal
-											isVisible={isInTimePickerVisible}
-											mode='time'
-											onConfirm={handleInTimeConfirm}
-											onCancel={hideInTimePicker}
-										/>
-									</View>
-									<View style={styles.rowFiller} />
-									<View style={styles.rowComponent}>
-										<Text style={styles.subtitle}>Out Time</Text>
-										<TouchableOpacity
-											onPress={showOutTimePicker}
-											style={styles.input}
-										>
-											<Text>
-												{outTime !== ''
-													? moment(outTime).format('hh:mm a')
-													: 'Select time'}
-											</Text>
-										</TouchableOpacity>
-										<DateTimePickerModal
-											isVisible={isOutTimePickerVisible}
-											mode='time'
-											onConfirm={handleOutTimeConfirm}
-											onCancel={hideOutTimePicker}
-										/>
-									</View>
-								</View>
 							)}
 							<View
 								style={{
@@ -359,10 +358,10 @@ const CreateShift = ({ route }) => {
 									width: `100%`,
 								}}
 							>
-								<Text style={{ marginRight: 10 }}>Hours</Text>
+								<Text style={{ marginRight: 10 }}>In/Out Time</Text>
 								<Switch
-									trackColor={{ false: '#767577', true: '#81b0ff' }}
-									thumbColor={hoursToggled ? '#f5dd4b' : '#f4f3f4'}
+									trackColor={{ false: '#767577', true: '#06D6A0' }}
+									thumbColor='#f4f3f4'
 									ios_backgroundColor='#3e3e3e'
 									onValueChange={toggleSwitch}
 									value={hoursToggled}
@@ -449,7 +448,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	inner: {
-		padding: 24,
+		paddingTop: 48,
+		paddingLeft: 48,
+		paddingRight: 48,
 		flex: 1,
 		justifyContent: `space-evenly`,
 	},
