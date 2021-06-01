@@ -1,6 +1,4 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { Button, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -21,8 +19,10 @@ import CreateShift from './src/screens/createShift';
 import ViewCalendar from './src/screens/viewCalendar';
 import ViewMetrics from './src/screens/viewMetrics';
 import ViewSettings from './src/screens/viewSettings';
-import Profile from './src/components/settingsProfile';
-import Jobs from './src/components/settingsJobs';
+import SettingsAccount from './src/components/settingsAccount';
+import SettingsSetUp from './src/components/settingsSetUp';
+import SettingsJobs from './src/components/settingsJobs';
+import SettingsStorage from './src/components/settingsStorage';
 import CreateJob from './src/components/createJob';
 import EditJob from './src/components/editJob';
 
@@ -33,7 +33,7 @@ const RootJobsScreen = ({ navigation }) => {
 		<RootStack.Navigator mode='modal'>
 			<RootStack.Screen
 				name='CurrentJobs'
-				component={Jobs}
+				component={SettingsJobs}
 				options={{ headerShown: false }}
 			/>
 			<RootStack.Screen
@@ -56,8 +56,10 @@ const SettingsStackScreen = ({ navigation }) => {
 	return (
 		<SettingsStack.Navigator>
 			<SettingsStack.Screen name='Settings' component={ViewSettings} />
-			<SettingsStack.Screen name='Profile' component={Profile} />
+			<SettingsStack.Screen name='Account' component={SettingsAccount} />
+			<SettingsStack.Screen name='Set_Up' component={SettingsSetUp} options={{ title: `Set Up`}} />
 			<SettingsStack.Screen name='Jobs' component={RootJobsScreen} />
+			<SettingsStack.Screen name='Storage' component={SettingsStorage} />
 		</SettingsStack.Navigator>
 	);
 };

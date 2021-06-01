@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
+// mockup
 const Settings = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
@@ -9,15 +10,24 @@ const Settings = ({ navigation }) => {
 				<Text style={styles.subtitleLg}>User Name</Text>
 				<Text>user email</Text>
 			</View>
-			<View>
-				<Text style={styles.subtitleMd}>Profile</Text>
+			<View style={styles.settingsContainer}>
+				<Text style={styles.subtitleMd}>Settings</Text>
 				<TouchableOpacity
 					style={styles.row}
 					onPress={() => {
-						navigation.navigate('Profile');
+						navigation.navigate('Account');
 					}}
 				>
-					<Text>Profile</Text>
+					<Text>Account</Text>
+					<AntDesign name='right' size={24} color='black' />
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={styles.row}
+					onPress={() => {
+						navigation.navigate('Set_Up');
+					}}
+				>
+					<Text>Set Up</Text>
 					<AntDesign name='right' size={24} color='black' />
 				</TouchableOpacity>
 				<TouchableOpacity
@@ -29,6 +39,15 @@ const Settings = ({ navigation }) => {
 					<Text>Jobs</Text>
 					<AntDesign name='right' size={24} color='black' />
 				</TouchableOpacity>
+				<TouchableOpacity
+					style={styles.row}
+					onPress={() => {
+						navigation.navigate('Storage');
+					}}
+				>
+					<Text>Storage</Text>
+					<AntDesign name='right' size={24} color='black' />
+				</TouchableOpacity>
 			</View>
 		</View>
 	);
@@ -36,6 +55,7 @@ const Settings = ({ navigation }) => {
 
 const styles = StyleSheet.create({
 	container: {
+		display: `flex`,
 		flex: 1,
 		padding: 24,
 	},
@@ -47,10 +67,12 @@ const styles = StyleSheet.create({
 		borderBottomColor: `black`,
 		borderBottomWidth: 1,
 		paddingBottom: 16,
+		marginTop: 8,
 		marginBottom: 16,
 	},
 	userInfoContainer: {
 		marginBottom: 32,
+		flex: 0.3,
 	},
 	subtitleLg: {
 		fontSize: 24,
@@ -59,6 +81,11 @@ const styles = StyleSheet.create({
 	subtitleMd: {
 		fontSize: 20,
 		fontWeight: `500`,
+	},
+	settingsContainer: {
+		flex: 5,
+		height: `100%`,
+		display: `flex`,
 	},
 });
 
