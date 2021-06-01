@@ -269,7 +269,7 @@ const CreateShift = ({ route }) => {
 
 							{/* Position Worked */}
 							<View style={styles.rowComponent}>
-								<Text style={styles.subtitle}>Position</Text>
+								<Text style={[styles.subtitle, { paddingTop: 5 }]}>Position</Text>
 								<RNPickerSelect
 									placeholder={{
 										label: 'Pick job',
@@ -469,7 +469,6 @@ const styles = StyleSheet.create({
 	},
 	subtitle: {
 		fontSize: 16,
-		fontWeight: `bold`,
 		paddingBottom: 5,
 		borderBottomWidth: 0.5,
 		borderBottomColor: 'lightgrey',
