@@ -70,6 +70,7 @@ const SettingsSetUp = () => {
             <Button
                 onPress={onSave} 
                 label="Save"
+                customStyle={{ alignSelf: `flex-end` }}
             />
             <View style={styles.row}>
                 <Text style={styles.label}>Notification reminder</Text>
@@ -80,6 +81,7 @@ const SettingsSetUp = () => {
                     ios_backgroundColor='#3e3e3e'
                     onValueChange={toggleSwitch}
                     value={remindersEnabled}
+                    style={{ alignSelf: `flex-end` }}
                 />
             </View>
             <View style={styles.fillerLarge} />

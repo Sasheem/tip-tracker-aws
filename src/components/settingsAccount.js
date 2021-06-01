@@ -72,7 +72,7 @@ const SettingsAccount = () => {
 			<View style={styles.buttonContainer}>
 				<Button onPress={onSavePassword} label='Save password' />
 			</View>
-			<View style={styles.fillerLg} />
+			<View style={styles.fillerMd} />
 		</View>
 	);
 };
@@ -96,8 +96,12 @@ const styles = StyleSheet.create({
 	fillerLg: {
 		flex: 4,
 	},
+	fillerMd: {
+		flex: 2.5,
+	},
 	buttonContainer: {
 		flex: 1,
+		alignSelf: `flex-end`
 	}
 });
 

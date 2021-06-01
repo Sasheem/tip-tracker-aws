@@ -59,12 +59,12 @@ const SettingsStorage = () => {
                 keyboardType='default'
             />
             <View style={styles.buttonContainer}>
-                <Button label='Send' onPress={sendExport} />
+                <Button label='Send' onPress={sendExport} customStyle={{ alignSelf: `flex-end` }} />
             </View>
             <View style={styles.row}>
                 <Text style={styles.subtitle}>Local data</Text>
-                <Text style={styles.desc}>Sync up your local data with cloud data.</Text>
-                <Button label='Sync' onPress={onSyncPress} />
+                <Text style={styles.desc}>Sync up your local data with cloud data to keep your shifts up to date in your calendar.</Text>
+                <Button label='Sync' onPress={onSyncPress} customStyle={{ alignSelf: `flex-end` }} />
             </View>
             
             {/* <View style={styles.row}>
@@ -118,10 +118,12 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     buttonContainer: {
+        width: `100%`,
         flex: 1,
     },
     row: {
         flex: 1,
+        width: `100%`,
     },
     fillerLg: {
         flex: 4,

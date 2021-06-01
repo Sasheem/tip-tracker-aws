@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
 
-const Button = ({ onPress, label }) => {
+const Button = ({ onPress, label, customStyle }) => {
     return (
         <TouchableOpacity
             onPress={onPress}
-            style={styles.button}
+            style={[styles.button, customStyle]}
         >
             <Text style={styles.label}>{label}</Text>
         </TouchableOpacity>
@@ -14,7 +14,6 @@ const Button = ({ onPress, label }) => {
 
 const styles = StyleSheet.create({
     button: {
-        width: `100%`,
         marginTop: 10,
         marginBottom: 10,
         padding: 10,
