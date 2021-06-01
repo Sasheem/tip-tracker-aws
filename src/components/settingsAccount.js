@@ -8,6 +8,7 @@ import Button from '../components/common/button';
 const SettingsAccount = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [newPassword, setNewPassword] = useState('');
 	const [confirm, setConfirm] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
 
@@ -20,7 +21,11 @@ const SettingsAccount = () => {
 		setPassword(text);
 		setErrorMessage('');
 	}
-	const onConfirmChange = text => {
+	const onNewChange = text => {
+		setNewPassword(text);
+		setErrorMessage('');
+	}
+ 	const onConfirmChange = text => {
 		setConfirm(text);
 		setErrorMessage('');
 	}
@@ -44,14 +49,21 @@ const SettingsAccount = () => {
 			</View>
 			<View style={styles.horizontalRule} />
 			<Input 
-				label='Password'
+				label='Current password'
 				placeholder='Add password requirements'
 				onChangeText={(text) => onPasswordChange(text)}
 				value={password}
 				secureTextEntry={true}
 			/>
 			<Input 
-				label='Confirm Password'
+				label='New password'
+				placeholder='Add password requirements'
+				onChangeText={(text) => onNewChange(text)}
+				value={newPassword}
+				secureTextEntry={true}
+			/>
+			<Input 
+				label='Confirm password'
 				placeholder='Confirm password'
 				onChangeText={(text) => onConfirmChange(text)}
 				value={confirm}
