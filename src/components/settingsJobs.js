@@ -98,6 +98,9 @@ const SettingsJobs = ({ navigation }) => {
 
 const styles = StyleSheet.create({
 	container: {
+		paddingTop: 24,
+		paddingLeft: 24,
+		paddingRight: 24,
 		flex: 1,
 		justifyContent: `space-between`,
 	},
