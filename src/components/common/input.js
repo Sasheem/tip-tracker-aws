@@ -1,17 +1,18 @@
 import React from 'react';
 import { StyleSheet, View, Text, TextInput } from 'react-native';
 
-export default function Input({ customInputStyle, label, placeholder, value, onChangeText, returnKeyType, keyboardType }) {
+export default function Input({ customInputStyle, label, placeholder, value, onChangeText, returnKeyType, keyboardType, secureTextEntry }) {
     return (
         <View style={styles.container}> 
-            <Text style={styles.text}>{label}</Text>
+            <Text style={styles.label}>{label}</Text>
             <TextInput 
                 style={[styles.input, customInputStyle]} 
                 placeholder={placeholder} 
                 onChangeText={onChangeText} 
                 value={value} 
                 returnKeyType={returnKeyType} 
-                keyboardType={keyboardType} 
+                keyboardType={keyboardType}
+                secureTextEntry={secureTextEntry} 
             />
         </View>
     );
@@ -20,10 +21,12 @@ export default function Input({ customInputStyle, label, placeholder, value, onC
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        width: `100%`,
+        marginBottom: 8,
     },
-    text: {
+    label: {
         fontSize: 16,
-		fontWeight: `bold`,
+        paddingTop: 5,
 		paddingBottom: 5,
 		borderBottomWidth: 0.5,
 		borderBottomColor: 'lightgrey',
