@@ -7,7 +7,7 @@ export default function Input({ customInputStyle, label, desc, placeholder, valu
             <Text style={styles.label}>{label}</Text>
             {desc && <Text style={styles.desc}>{desc}</Text>}
             <TextInput 
-                style={[styles.input, customInputStyle]} 
+                style={[styles.input, ...customInputStyle]} 
                 placeholder={placeholder} 
                 onChangeText={onChangeText} 
                 value={value} 
