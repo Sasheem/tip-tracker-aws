@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
 
-const Button = ({ onPress, label, customStyle }) => {
+const CustomButton = ({ onPress, label, customStyle }) => {
     return (
         <TouchableOpacity
             onPress={onPress}
@@ -28,4 +28,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Button;
+export default CustomButton;

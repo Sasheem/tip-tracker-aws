@@ -2,8 +2,8 @@ import React, { useState }  from 'react';
 import { StyleSheet, View, Text, Switch } from 'react-native';
 
 // local components
-import Input from './common/input';
-import Button from './common/button';
+import CustomInput from './common/customInput';
+import CustomButton from './common/customButton';
 
 const SettingsSetUp = () => {
     const [remindersEnabled, setRemindersEnabled] = useState(false);
@@ -43,7 +43,7 @@ const SettingsSetUp = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.subtitle}>Tip Goals</Text>
-            <Input
+            <CustomInput
                 label='Daily' 
                 placeholder='$0.00'
                 value={dailyGoal}
@@ -51,7 +51,7 @@ const SettingsSetUp = () => {
                 returnKeyType='done'
                 keyboardType='decimal-pad'
             /> 
-            <Input
+            <CustomInput
                 label='Weekly' 
                 placeholder='$0.00'
                 value={weeklyGoal}
@@ -59,7 +59,7 @@ const SettingsSetUp = () => {
                 returnKeyType='done'
                 keyboardType='decimal-pad'
             />
-            <Input
+            <CustomInput
                 label='Monthly' 
                 placeholder='$0.00'
                 value={monthlyGoal}
@@ -67,7 +67,7 @@ const SettingsSetUp = () => {
                 returnKeyType='done'
                 keyboardType='decimal-pad'
             />
-            <Button
+            <CustomButton
                 onPress={onSave} 
                 label="Save"
                 customStyle={{ alignSelf: `flex-end` }}

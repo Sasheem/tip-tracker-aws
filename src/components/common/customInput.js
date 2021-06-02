@@ -1,13 +1,13 @@
 import React from 'react';
 import { StyleSheet, View, Text, TextInput } from 'react-native';
 
-export default function Input({ customInputStyle, label, desc, placeholder, value, onChangeText, returnKeyType, keyboardType, secureTextEntry }) {
+export default function CustomInput({ customInputStyle, label, desc, placeholder, value, onChangeText, returnKeyType, keyboardType, secureTextEntry }) {
     return (
         <View style={styles.container}> 
             <Text style={styles.label}>{label}</Text>
             {desc && <Text style={styles.desc}>{desc}</Text>}
             <TextInput 
-                style={[styles.input, ...customInputStyle]} 
+                style={[styles.input, customInputStyle]} 
                 placeholder={placeholder} 
                 onChangeText={onChangeText} 
                 value={value} 

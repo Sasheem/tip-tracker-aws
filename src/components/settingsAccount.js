@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
 // local components
-import Input from '../components/common/input';
-import Button from '../components/common/button';
+import CustomInput from './common/customInput';
+import CustomButton from './common/customButton';
 
 const SettingsAccount = () => {
 	const [email, setEmail] = useState('');
@@ -37,7 +37,7 @@ const SettingsAccount = () => {
 	}
 	return (
 		<View style={styles.container}>
-			<Input 
+			<CustomInput 
 				label='Email'
 				placeholder='example@email.com'
 				onChangeText={(text) => onEmailChange(text)}
@@ -45,24 +45,24 @@ const SettingsAccount = () => {
 				keyboardType='default'
 			/>
 			<View style={styles.buttonContainer}>
-				<Button onPress={onSaveEmail} label='Save email' />
+				<CustomButton onPress={onSaveEmail} label='Save email' />
 			</View>
 			<View style={styles.horizontalRule} />
-			<Input 
+			<CustomInput 
 				label='Current password'
 				placeholder='Add password requirements'
 				onChangeText={(text) => onPasswordChange(text)}
 				value={password}
 				secureTextEntry={true}
 			/>
-			<Input 
+			<CustomInput 
 				label='New password'
 				placeholder='Add password requirements'
 				onChangeText={(text) => onNewChange(text)}
 				value={newPassword}
 				secureTextEntry={true}
 			/>
-			<Input 
+			<CustomInput 
 				label='Confirm password'
 				placeholder='Confirm password'
 				onChangeText={(text) => onConfirmChange(text)}
@@ -70,7 +70,7 @@ const SettingsAccount = () => {
 				secureTextEntry={true}
 			/>
 			<View style={styles.buttonContainer}>
-				<Button onPress={onSavePassword} label='Save password' />
+				<CustomButton onPress={onSavePassword} label='Save password' />
 			</View>
 			<View style={styles.fillerMd} />
 		</View>
