@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
 	StyleSheet,
 	View,
@@ -10,27 +10,24 @@ import {
 } from 'react-native';
 import _ from 'lodash';
 import Swiper from 'react-native-swiper';
-import { API, graphqlOperation } from 'aws-amplify';
 
-import { deleteShift, updateShift } from '../graphql/mutations';
+import { Context as ShiftsContext } from '../context/ShiftsContext';
 
 import EditShift from './editShift';
 import DeleteShift from './deleteShift';
 import ShiftTag from './shiftTag';
 
 const DetailFull = ({ currentDetail, jobs }) => {
+	const { removeShift } = useContext(ShiftsContext);
 	const shifts = Object.entries(currentDetail);
 	const [deleteModal, setDeleteModal] = useState(false);
 	const [editModal, setEditModal] = useState(false);
 	console.log(`shifts length: ${shifts.length}`);
-	const handleDeleteShift = () => {
-		// prepare data
-		const input = {
-			id: currentDetail[Object.keys(currentDetail)[0]].id,
-		};
 
-		// delete from backend
-		API.graphql(graphqlOperation(deleteShift, { input }));
+	const handleDeleteShift = () => {
+
+		// run delete action
+		removeShift(currentDetail[Object.keys(currentDetail)[0]].id);
 
 		// close modal
 		setDeleteModal(false);
