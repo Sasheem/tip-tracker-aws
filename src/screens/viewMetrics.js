@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
 	StyleSheet,
 	Text,
@@ -12,8 +12,9 @@ import _ from 'lodash';
 import RNPickerSelect from 'react-native-picker-select';
 import { AntDesign } from '@expo/vector-icons';
 
-import { listJobs, listShifts } from '../graphql/queries';
+import { listJobs } from '../graphql/queries';
 
+import { Context as ShiftsContext } from '../context/ShiftsContext';
 import MetricComponent from '../components/metricComponent';
 import SummaryMetric from '../components/summaryMetric';
 
@@ -25,7 +26,7 @@ import SummaryMetric from '../components/summaryMetric';
  */
 
 const ViewMetrics = () => {
-	const [shifts, setShifts] = useState([]);
+	const { state: fetchedShifts, getShifts } = useContext(ShiftsContext);
 	const [jobs, setJobs] = useState([]);
 	const [dailyLabel, setDailyLabel] = useState(moment().format('MM-DD-YYYY'));
 	const [daily, setDaily] = useState({});
@@ -59,8 +60,8 @@ const ViewMetrics = () => {
 	useEffect(() => {
 		var daily = [];
 
-		if (shifts.length !== 0) {
-			const sortedShifts = _.sortBy(shifts, (shift) => shift.createdAt);
+		if (fetchedShifts.length !== 0) {
+			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt);
 			console.log(
 				`setting to last shift in sortedShifts: ${JSON.stringify(
 					sortedShifts[sortedShifts.length - 1]
@@ -80,7 +81,7 @@ const ViewMetrics = () => {
 			setDaily({ ...sortedShifts[sortedShifts.length - 1] });
 		}
 		setDailyItems(daily);
-	}, [shifts]);
+	}, [fetchedShifts]);
 
 	/**
 	 * todo pair the corresponding date range in the week label
@@ -90,8 +91,8 @@ const ViewMetrics = () => {
 		var weekly = [];
 		var weeklyStrings = [];
 
-		if (shifts.length !== 0) {
-			const sortedShifts = _.sortBy(shifts, (shift) => shift.createdAt);
+		if (fetchedShifts.length !== 0) {
+			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt);
 			_.map(_.reverse(sortedShifts), (shift) => {
 				var tempWeek = moment(shift.createdAt, 'MM-DD-YYYY').format('w');
 
@@ -111,7 +112,7 @@ const ViewMetrics = () => {
 			});
 		}
 		setWeeklyItems(weekly);
-	}, [shifts]);
+	}, [fetchedShifts]);
 
 	// set up monthly items array for RNPickerSelect
 	useEffect(() => {
@@ -119,8 +120,8 @@ const ViewMetrics = () => {
 		var monthlyStrings = [];
 
 		// only perform if shifts is not empty
-		if (shifts.length !== 0) {
-			const sortedShifts = _.sortBy(shifts, (shift) => shift.createdAt);
+		if (fetchedShifts.length !== 0) {
+			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt);
 
 			_.map(_.reverse(sortedShifts), (shift) => {
 				var tempMonth = moment(shift.createdAt, 'MM-DD-YYYY').format('MMMM');
@@ -145,15 +146,15 @@ const ViewMetrics = () => {
 			});
 		}
 		setMonthlyItems(monthly);
-	}, [shifts]);
+	}, [fetchedShifts]);
 
 	// set up yearly items array for RNPickerSelect
 	useEffect(() => {
 		var yearly = [];
 		var yearlyStrings = [];
 
-		if (shifts.length !== 0) {
-			const sortedShifts = _.sortBy(shifts, (shift) => shift.createdAt);
+		if (fetchedShifts.length !== 0) {
+			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt);
 			_.map(_.reverse(sortedShifts), (shift) => {
 				var tempYear = moment(shift.createdAt, 'MM-DD-YYYY').format('YYYY');
 
@@ -169,7 +170,7 @@ const ViewMetrics = () => {
 			});
 		}
 		setYearlyItems(yearly);
-	}, [shifts]);
+	}, [fetchedShifts]);
 
 	// calculate lifetime and top metrics
 	useEffect(() => {
@@ -180,8 +181,8 @@ const ViewMetrics = () => {
 		var topHours = 0.0;
 		var topHourly = 0.0;
 
-		if (shifts.length !== 0) {
-			_.map(shifts, (shift) => {
+		if (fetchedShifts.length !== 0) {
+			_.map(fetchedShifts, (shift) => {
 				// calculate lifetime metrics
 				let amount = parseFloat(shift.amount);
 				let hours = parseFloat(shift.hours);
@@ -222,15 +223,15 @@ const ViewMetrics = () => {
 				hourly: lifetimeHourly.toFixed(1),
 			});
 		}
-	}, [shifts]);
+	}, [fetchedShifts]);
 
 	// filter metrics based on day with momentjs
 	useEffect(() => {
-		const result = _.filter(shifts, (shift) =>
+		const result = _.filter(fetchedShifts, (shift) =>
 			moment(dailyLabel, 'MM-DD-YYYY').isSame(shift.createdAt, 'day')
 		);
 		setDaily({ ...result[0] });
-	}, [shifts, dailyLabel]);
+	}, [fetchedShifts, dailyLabel]);
 
 	// filter metrics based on week with momentjs
 	/**
@@ -245,7 +246,7 @@ const ViewMetrics = () => {
 		var totalAmount = 0.0;
 		var totalHours = 0.0;
 		var totalHourly = 0.0;
-		const results = _.filter(shifts, (shift) => {
+		const results = _.filter(fetchedShifts, (shift) => {
 			// using == because one is a number and other is string, respectively
 			return weeklyLabel == moment(shift.createdAt, 'MM-DD-YYYY').week();
 		});
@@ -274,33 +275,33 @@ const ViewMetrics = () => {
 				label: `Week ${weekNumber}`,
 			});
 		}
-	}, [shifts, weeklyLabel]);
+	}, [fetchedShifts, weeklyLabel]);
 
 	// filter metrics based on month with momentjs
 	useEffect(() => {
-		const results = _.filter(shifts, (shift) => {
+		const results = _.filter(fetchedShifts, (shift) => {
 			let monthTemp = moment(shift.createdAt).format('MMMM');
 			let yearTemp = moment(shift.createdAt).format('YYYY');
 			return monthTemp === monthlyMonthLabel && yearTemp == monthlyYearLabel;
 		});
 		setMonthly(calculate(results));
-	}, [shifts, monthlyLabel]);
+	}, [fetchedShifts, monthlyLabel]);
 
 	// filter metrics based on year with momentjs
 	useEffect(() => {
-		const results = _.filter(shifts, (shift) =>
+		const results = _.filter(fetchedShifts, (shift) =>
 			moment(yearlyLabel, 'YYYY').isSame(shift.createdAt, 'year')
 		);
 		setYearly(calculate(results));
-	}, [shifts, yearlyLabel]);
+	}, [fetchedShifts, yearlyLabel]);
 
 	// helper function - return calculated amount, hours, hourly in object
-	const calculate = (shifts) => {
+	const calculate = (fetchedShifts) => {
 		var totalAmount = 0.0;
 		var totalHours = 0.0;
 		var totalHourly = 0.0;
 
-		_.map(shifts, (shift) => {
+		_.map(fetchedShifts, (shift) => {
 			let amount = parseFloat(shift.amount !== '' ? shift.amount : '0');
 			let hours = parseFloat(shift.hours);
 
@@ -318,12 +319,6 @@ const ViewMetrics = () => {
 			hours: totalHours.toFixed(1),
 			hourly: totalHourly.toFixed(1),
 		};
-	};
-
-	// helper function - fetch shifts
-	const getShifts = async () => {
-		const result = await API.graphql(graphqlOperation(listShifts));
-		setShifts(result.data.listShifts.items);
 	};
 
 	// helper function - fetch jobs

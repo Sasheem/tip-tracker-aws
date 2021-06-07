@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
 	Platform,
 	KeyboardAvoidingView,
@@ -8,7 +8,6 @@ import {
 	TouchableWithoutFeedback,
 	Text,
 	TextInput,
-	Button,
 	TouchableOpacity,
 	Switch,
 	SafeAreaView,
@@ -19,13 +18,13 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import _ from 'lodash';
 import { AntDesign } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
 import { createShift } from '../graphql/mutations';
 import { listJobs } from '../graphql/queries';
 import RNPickerSelect from 'react-native-picker-select';
 
+import { Context as ShiftsContext } from '../context/ShiftsContext';
 import ShiftTag from '../components/shiftTag';
-import Input from '../components/common/input'
+import CustomInput from '../components/common/customInput'
 
 /**
  * todo add functionality to arrow buttons to modify date label DONE
@@ -45,6 +44,8 @@ import Input from '../components/common/input'
  */
 
 const CreateShift = ({ route }) => {
+	// context
+	const { state: fetchedShifts } = useContext(ShiftsContext);
 	// state
 	const [date, setDate] = useState(moment().format('L'));
 	const [amount, setAmount] = useState('');
@@ -63,7 +64,7 @@ const CreateShift = ({ route }) => {
 	const [isOutTimePickerVisible, setOutTimePickerVisibility] = useState(false);
 	const [tagError, setTagError] = useState('');
 	const [formError, setFormError] = useState('');
-
+	
 	// load date from route
 	useEffect(() => {
 		if (!_.isEmpty(route.params)) {
@@ -83,8 +84,10 @@ const CreateShift = ({ route }) => {
 
 	// when component mounts fetch jobs
 	useEffect(() => {
-		console.log(`fetching jobs`);
+		console.log(`createShift: fetching jobs`);
 		getJobs();
+		// console.log(`Jobs from App.js`);
+		// setJobs(route.params.jobs);
 	}, []);
 
 	// create job array for RNPickerSelect
@@ -195,6 +198,15 @@ const CreateShift = ({ route }) => {
 			setHours(duration);
 		}
 
+		// make sure hours isn't larger than 24
+		if (parseInt(hours) > 24) {
+			return setFormError(`Too many hours in a day`);
+		}
+
+		// send to context
+		// not being used right now
+		// addShift(date, amount, inTime, outTime, duration !== '' ? duration : hours, job, tags, () => console.log(`Shift added!`))
+
 		// prepare data
 		const input = {
 			createdAt: date,
@@ -255,7 +267,7 @@ const CreateShift = ({ route }) => {
 						<View style={[styles.row2x, { marginBottom: 20 }]}>
 							{/* Amount Earned */}
 							<View style={styles.rowComponent}>
-								<Input 
+								<CustomInput 
 									label='Earnings' 
 									placeholder='$0.00' 
 									customInputStyle={styles.earningsIOS} 
@@ -333,7 +345,7 @@ const CreateShift = ({ route }) => {
 							</View>
 							) : (
 								<View>
-									<Input
+									<CustomInput
 										label='Hours' 
 										placeholder='4.5'
 										customInputStyle={
@@ -424,7 +436,7 @@ const CreateShift = ({ route }) => {
 								onPress={handleSubmit}
 								style={styles.buttonSubmit}
 							>
-								<Text style={styles.buttonText}>Add</Text>
+								<Text style={styles.buttonText}>Submit</Text>
 							</TouchableOpacity>
 						</View>
 

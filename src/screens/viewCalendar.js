@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
 	StyleSheet,
 	Text,
@@ -11,13 +11,10 @@ import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
 import _ from 'lodash';
 
-import { listShifts, listJobs } from '../graphql/queries';
-import {
-	onCreateShift,
-	onDeleteShift,
-	onUpdateShift,
-} from '../graphql/subscriptions';
+
+import { listJobs } from '../graphql/queries';
 import CalendarDetail from '../components/calendarDetail';
+import { Context as ShiftsContext } from '../context/ShiftsContext';
 /**
  * todo Fix app so shift data shows up when you switch to the tab
  * 		? currently I need to navigate to another month and back
@@ -25,7 +22,7 @@ import CalendarDetail from '../components/calendarDetail';
  */
 
 const ViewCalendar = ({ navigation }) => {
-	const [shifts, setShifts] = useState([]);
+	const { state: fetchedShifts, getShifts } = useContext(ShiftsContext);
 	const [jobs, setJobs] = useState([]);
 	const [currentDetail, setCurrentDetail] = useState({});
 	const [currentDate, setCurrentDate] = useState('');
@@ -36,59 +33,31 @@ const ViewCalendar = ({ navigation }) => {
 		getShifts();
 		console.log(`fetching jobs`);
 		getJobs();
+
+		// listen for when this component ViewCalendar gains focus or
+        // becomes the primary component on the screen
+		const unsubscribe = navigation.addListener('tabPress', e => {
+			console.log(`tab pressed getting shifts`);
+			getShifts();
+		})
+		
+		// clean up
+        // tell react-navigation we don't need to listen anymore
+		return unsubscribe;
 	}, []);
 
-	// onCreateSubscription - Listener
 	useEffect(() => {
-		const onCreateSubscription = API.graphql(
-			graphqlOperation(onCreateShift)
-		).subscribe({
-			// error: (err) => console.log('error caught', err),
-			error: (err) => {},
-			next: (shiftData) => {
-				const newShift = shiftData.value.data.onCreateShift;
-				console.log(`newShift: ${JSON.stringify(newShift)}`);
-				const prevShifts = shifts.filter((shift) => shift.id !== newShift.id);
-				console.log(`prevShifts.length: ${prevShifts.length}`);
-				setShifts([...prevShifts, newShift]);
-			},
-		});
-		return () => {
-			if (onCreateSubscription) {
-				onCreateSubscription.unsubscribe();
-			}
-		};
-	}, [shifts]);
+		// listen for when this component ViewCalendar gains focus or
+        // becomes the primary component on the screen
+		const unsubscribe = navigation.addListener('tabPress', e => {
+			console.log(`tab pressed getting shifts`);
+			getShifts();
+		})
 
-	// onDeleteSubscription - Listener
-	useEffect(() => {
-		const onDeleteSubscription = API.graphql(
-			graphqlOperation(onDeleteShift)
-		).subscribe({
-			// error: (err) => console.log('error caught', err),
-			error: (err) => {},
-			next: (shiftData) => {
-				const deletedShift = shiftData.value.data.onDeleteShift;
-				const updatedShifts = _.filter(
-					shifts,
-					(shift) => shift.id !== deletedShift.id
-				);
-				setShifts(updatedShifts);
-			},
-		});
-
-		return () => {
-			if (onDeleteSubscription) {
-				onDeleteSubscription.unsubscribe();
-			}
-		};
-	}, [shifts]);
-
-	// helper function - fetch shifts
-	const getShifts = async () => {
-		const result = await API.graphql(graphqlOperation(listShifts));
-		setShifts(result.data.listShifts.items);
-	};
+		// clean up
+        // tell react-navigation we don't need to listen anymore
+		return unsubscribe;
+	}, [navigation])
 
 	// helper function - fetch jobs
 	const getJobs = async () => {
@@ -115,7 +84,7 @@ const ViewCalendar = ({ navigation }) => {
 		var hours = 0.0;
 		var hourly = 0.0;
 
-		const results = shifts.filter(
+		const results = fetchedShifts.filter(
 			(shift) =>
 				date.dateString ===
 				moment(shift.createdAt, 'MM-DD-YYYY').format('YYYY-MM-DD')
@@ -173,7 +142,7 @@ const ViewCalendar = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
 			{/* Calendar Component */}
-			{shifts.length !== 0 ? (
+			{!_.isEmpty(fetchedShifts) ? (
 				<Calendar
 					showWeekNumbers
 					hideExtraDays
@@ -181,9 +150,7 @@ const ViewCalendar = ({ navigation }) => {
 					theme={{
 						arrowColor: '#06D6A0',
 					}}
-					dayComponent={({ date, state }) => {
-						return renderDayComponent(date, state);
-					}}
+					dayComponent={({ date, state }) => renderDayComponent(date, state)}
 				/>
 			) : (
 				<View style={[styles.activityContainer, styles.activityHorizontal]}>
