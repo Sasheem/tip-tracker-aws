@@ -143,18 +143,6 @@ const CreateJob = ({ navigation }) => {
 								/>
 							</View>
 
-							{/* Job Wage Input */}
-							<View style={styles.row}>
-								<Text style={styles.subtitle}>Job Wage</Text>
-								<TextInput
-									style={styles.textInput}
-									placeholder='5.54'
-									keyboardType='decimal-pad'
-									onChangeText={(text) => onWageChange(text)}
-									value={jobWage}
-								/>
-							</View>
-
 							{/* Job Name Input */}
 							<View style={styles.row}>
 								<Text style={styles.subtitle}>Job Name</Text>
@@ -163,6 +151,19 @@ const CreateJob = ({ navigation }) => {
 									placeholder='Outback, Carrabas, etc.'
 									onChangeText={(text) => onNameChange(text)}
 									value={storeName}
+								/>
+							</View>
+
+							{/* Job Wage Input */}
+							<View style={styles.row}>
+								<Text style={styles.subtitle}>Job Wage</Text>
+								<TextInput
+									style={styles.textInput}
+									placeholder='5.54'
+									keyboardType='decimal-pad'
+									returnKeyType='done'
+									onChangeText={(text) => onWageChange(text)}
+									value={jobWage}
 								/>
 							</View>
 
@@ -190,6 +191,7 @@ const CreateJob = ({ navigation }) => {
 									style={styles.textInput}
 									placeholder='Zip Code'
 									keyboardType='number-pad'
+									returnKeyType='done'
 									onChange={(event) => onAddressChange(event, 'address_zip')}
 									value={storeAddress.address_zip}
 								/>
@@ -202,7 +204,7 @@ const CreateJob = ({ navigation }) => {
 							</View>
 							<View style={styles.btnContainer}>
 								<TouchableOpacity onPress={handleSubmit} style={styles.btn}>
-									<Text>Save</Text>
+									<Text style={styles.btnText}>Save</Text>
 								</TouchableOpacity>
 							</View>
 							{formError !== '' && (
@@ -250,6 +252,11 @@ const styles = StyleSheet.create({
 		backgroundColor: `#06D6A0`,
 		alignItems: `center`,
 		borderRadius: 2.5,
+	},
+	btnText: {
+		color: `white`,
+		fontSize: 18,
+		fontWeight: `500`
 	},
 	title: {
 		fontSize: 36,
