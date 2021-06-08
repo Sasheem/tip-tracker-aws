@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
 	StyleSheet,
 	Text,
@@ -7,15 +7,16 @@ import {
 	TouchableOpacity,
 	Modal,
 } from 'react-native';
-import { API, graphqlOperation } from 'aws-amplify';
 import { AntDesign } from '@expo/vector-icons';
 import _ from 'lodash';
 
-import { listJobs } from '../graphql/queries';
-import { onCreateJob } from '../graphql/subscriptions';
+import { Context as JobsContext } from '../context/JobsContext';
 import EditJob from './editJob';
 
 const SettingsJobs = ({ navigation }) => {
+	// context
+	const { state: fetchedJobs, getJobs } = useContext(JobsContext);
+	// state
 	const [jobs, setJobs] = useState([]);
 	const [deleteModal, setDeleteModal] = useState(false);
 	const [editModal, setEditModal] = useState(false);
@@ -23,34 +24,17 @@ const SettingsJobs = ({ navigation }) => {
 	useEffect(() => {
 		console.log(`fetching jobs`);
 		getJobs();
+		// listen for when this component ViewCalendar gains focus or
+        // becomes the primary component on the screen
+		const unsubscribe = navigation.addListener('focs', e => {
+			console.log(`tab pressed getting shifts`);
+			getJobs();
+		})
+
+		// clean up
+        // tell react-navigation we don't need to listen anymore
+		return unsubscribe;
 	}, []);
-
-	// onCreateJob listener, update jobs with newly added job
-	useEffect(() => {
-		const onCreateSubscription = API.graphql(
-			graphqlOperation(onCreateJob)
-		).subscribe({
-			// error: (err) => console.log('error caught', err),
-			error: (err) => {},
-			next: (jobData) => {
-				const newJob = jobData.value.data.onCreateJob;
-				const prevJobs = _.filter(jobs, (job) => job.id !== newJob.id);
-				setJobs([...prevJobs, newJob]);
-			},
-		});
-
-		return () => {
-			if (onCreateSubscription) {
-				onCreateSubscription.unsubscribe();
-			}
-		};
-	}, [jobs]);
-
-	// fetch jobs
-	const getJobs = async () => {
-		const result = await API.graphql(graphqlOperation(listJobs));
-		setJobs(result.data.listJobs.items);
-	};
 
 	return (
 		<View style={styles.container}>
@@ -62,8 +46,8 @@ const SettingsJobs = ({ navigation }) => {
 				<View style={styles.tableFiller} />
 			</View>
 			<View style={styles.tableBody}>
-				{jobs.length !== 0 ? (
-					_.map(jobs, (job) => (
+				{fetchedJobs.length !== 0 ? (
+					_.map(fetchedJobs, (job) => (
 						<TouchableOpacity
 							key={job.id}
 							style={styles.jobs}

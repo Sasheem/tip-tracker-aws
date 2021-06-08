@@ -19,10 +19,10 @@ import moment from 'moment';
 import _ from 'lodash';
 import { AntDesign } from '@expo/vector-icons';
 import { createShift } from '../graphql/mutations';
-import { listJobs } from '../graphql/queries';
 import RNPickerSelect from 'react-native-picker-select';
 
 import { Context as ShiftsContext } from '../context/ShiftsContext';
+import { Context as JobsContext } from '../context/JobsContext';
 import ShiftTag from '../components/shiftTag';
 import CustomInput from '../components/common/customInput'
 
@@ -46,6 +46,8 @@ import CustomInput from '../components/common/customInput'
 const CreateShift = ({ route }) => {
 	// context
 	const { state: fetchedShifts } = useContext(ShiftsContext);
+	const { state: fetchedJobs, getJobs } = useContext(JobsContext);
+
 	// state
 	const [date, setDate] = useState(moment().format('L'));
 	const [amount, setAmount] = useState('');
@@ -94,14 +96,14 @@ const CreateShift = ({ route }) => {
 	useEffect(() => {
 		var jobsToPick = [];
 
-		_.map(jobs, (job) => {
+		_.map(fetchedJobs, (job) => {
 			jobsToPick.push({
 				label: `${job.jobTitle}`,
 				value: `${job.id}`,
 			});
 		});
 		setJobItems(jobsToPick);
-	}, [jobs]);
+	}, [fetchedJobs]);
 
 	// helper functions
 	const onAmountChange = (text) => {
@@ -121,11 +123,6 @@ const CreateShift = ({ route }) => {
 	const hideInTimePicker = () => setInTimePickerVisibility(false);
 	const hideOutTimePicker = () => setOutTimePickerVisibility(false);
 
-	// fetch jobs
-	const getJobs = async () => {
-		const result = await API.graphql(graphqlOperation(listJobs));
-		setJobs(result.data.listJobs.items);
-	};
 
 	// handle date back arrow pressed
 	const handleDateBackward = () =>
