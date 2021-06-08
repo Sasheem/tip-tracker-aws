@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
 	View,
 	Text,
@@ -13,9 +13,14 @@ import {
 import _ from 'lodash';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
+import { Context as JobsContext } from '../context/JobsContext';
 
 const EditJob = ({ route, navigation }) => {
+	// context
+	const { removeJob } = useContext(JobsContext);
+	// state
 	const [data, setData] = useState({
+		id: '',
 		jobTitle: '',
 		jobWage: '',
 		storeName: '',
@@ -48,8 +53,9 @@ const EditJob = ({ route, navigation }) => {
 	// set up form with incoming route data
 	useEffect(() => {
 		if (!_.isEmpty(route.params)) {
-			const { jobTitle, jobWage, storeName, storeAddress } = route.params.job;
+			const { id, jobTitle, jobWage, storeName, storeAddress } = route.params.job;
 			setData({
+				id,
 				jobTitle,
 				jobWage,
 				storeName,
@@ -76,7 +82,17 @@ const EditJob = ({ route, navigation }) => {
 			>
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 					<ScrollView style={styles.body}>
-						<Text style={styles.title}>Edit Job</Text>
+						<View style={styles.titleRow}>
+							<Text style={styles.title}>Edit Job</Text>
+							<TouchableOpacity 
+								style={styles.deleteBtn} 
+								onPress={() => removeJob(data.id, () => navigation.navigate('CurrentJobs'))}
+							>
+								<Ionicons name="md-trash" size={24} color="#EF476F" />
+								<Text style={styles.deleteText}>Delete</Text>
+							</TouchableOpacity>
+						</View>
+						
 						<View style={styles.row}>
 							<Text style={styles.subtitle}>Title</Text>
 							<TextInput
@@ -226,6 +242,11 @@ const styles = StyleSheet.create({
 	row: {
 		flex: 1,
 	},
+	titleRow: {
+		flex: 1,
+		flexDirection: `row`,
+		justifyContent: `space-between`
+	},
 	rowLarge: {
 		flex: 4,
 	},
@@ -242,6 +263,16 @@ const styles = StyleSheet.create({
 		alignItems: `center`,
 		borderRadius: 2.5,
 	},
+	deleteBtn: {
+		flexDirection: `row`,
+		justifyContent: `flex-end`,
+		alignItems: `center`
+	},
+	deleteText: {
+		color: `#EF476F`,
+		fontSize: 18,
+		marginLeft: 8
+	}
 });
 
 export default EditJob;
