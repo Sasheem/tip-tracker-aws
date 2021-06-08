@@ -15,7 +15,8 @@ Amplify.configure({
 	},
 });
 
-import { Provider as ShiftsProvider } from './src/context/ShiftsContext'
+import { Provider as ShiftsProvider } from './src/context/ShiftsContext';
+import { Provider as JobsProvider } from './src/context/JobsContext';
 import CreateShift from './src/screens/createShift';
 import ViewCalendar from './src/screens/viewCalendar';
 import ViewMetrics from './src/screens/viewMetrics';
@@ -70,38 +71,40 @@ const Tab = createBottomTabNavigator();
 const App = () => {
 	return (
 		<ShiftsProvider>
-			<NavigationContainer>
-				<Tab.Navigator
-					screenOptions={({ route }) => ({
-						tabBarIcon: ({ color }) => {
-							let iconName;
+			<JobsProvider>
+				<NavigationContainer>
+					<Tab.Navigator
+						screenOptions={({ route }) => ({
+							tabBarIcon: ({ color }) => {
+								let iconName;
 
-							if (route.name === 'Shift') {
-								iconName = `md-add`;
-							} else if (route.name === 'Calendar') {
-								iconName = `md-calendar`;
-							} else if (route.name === 'Metrics') {
-								iconName = `md-stats`;
-							} else if (route.name === 'Settings') {
-								iconName = `md-settings`;
-							}
+								if (route.name === 'Shift') {
+									iconName = `md-add`;
+								} else if (route.name === 'Calendar') {
+									iconName = `md-calendar`;
+								} else if (route.name === 'Metrics') {
+									iconName = `md-stats`;
+								} else if (route.name === 'Settings') {
+									iconName = `md-settings`;
+								}
 
-							return <Ionicons name={iconName} size={25} color={color} />;
-						},
-					})}
-					tabBarOptions={{
-						activeTintColor: '#06D6A0',
-						inactiveTintColor: 'gray',
-						showLabel: false,
-						showIcon: true,
-					}}
-				>
-					<Tab.Screen name='Shift' component={CreateShift} options={{ tabBarLabel: 'Add' }} />
-					<Tab.Screen name='Calendar' component={ViewCalendar} options={{ title: 'Calendar' }} />
-					<Tab.Screen name='Metrics' component={ViewMetrics} options={{ title: 'Metrics' }} />
-					<Tab.Screen name='Settings' component={SettingsStackScreen} />
-				</Tab.Navigator>
-			</NavigationContainer>
+								return <Ionicons name={iconName} size={25} color={color} />;
+							},
+						})}
+						tabBarOptions={{
+							activeTintColor: '#06D6A0',
+							inactiveTintColor: 'gray',
+							showLabel: false,
+							showIcon: true,
+						}}
+					>
+						<Tab.Screen name='Shift' component={CreateShift} options={{ tabBarLabel: 'Add' }} />
+						<Tab.Screen name='Calendar' component={ViewCalendar} options={{ title: 'Calendar' }} />
+						<Tab.Screen name='Metrics' component={ViewMetrics} options={{ title: 'Metrics' }} />
+						<Tab.Screen name='Settings' component={SettingsStackScreen} />
+					</Tab.Navigator>
+				</NavigationContainer>
+			</JobsProvider>
 		</ShiftsProvider>
 	);
 };
