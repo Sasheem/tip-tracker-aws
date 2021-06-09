@@ -1,7 +1,7 @@
 import createDataContext from './createDataContext'; 
 import { API, graphqlOperation } from 'aws-amplify';
 import { listJobs } from '../graphql/queries';
-import { deleteJob } from '../graphql/mutations';
+import { createJob, deleteJob, updateJob } from '../graphql/mutations';
 // reducer
 const JobsReducer = (state, action) => {
     switch (action.type) {
@@ -9,8 +9,13 @@ const JobsReducer = (state, action) => {
             return action.payload;
         case 'delete_job':
             return state.filter((shift) => shift.id !== action.payload);
+        // remember .map returns an array
+        // the inner return stmt refers to the current iteration, essentially replacing the targeted job
+        // with the new data from action.payload object
         case 'edit_job':
-            return state;
+            return state.map((jobItem) => {
+                return jobItem.id === action.payload.id ? action.payload : jobItem
+            })
         default:
             return state;
     }
@@ -26,6 +31,19 @@ const getJobs = dispatch => {
         })
     };
 };
+const addJob = () => {
+    return async (jobTitle, jobWage, storeName, storeAddress, callback) => {
+        // prepare data
+		const input = {
+			jobTitle,
+			jobWage: parseFloat(jobWage),
+			storeName,
+			storeAddress,
+		};
+        await API.graphql(graphqlOperation(createJob, { input }));
+        callback && callback();
+    };
+};
 const removeJob = dispatch => {
     return async (id, callback) => {
         // prepare data
@@ -38,11 +56,37 @@ const removeJob = dispatch => {
         callback && callback();
     }
 };
+const editJob = dispatch => {
+    return async (id, title, wage, name, address, callback) => {
+        // prepare data
+        const input = {
+            id,
+            jobTitle: title,
+            jobWage: wage,
+            storeName: name,
+            storeAddress: address
+        };
+        
+        // update in backend
+        await API.graphql(graphqlOperation(updateJob, { input }));
+        dispatch({ 
+            type: 'edit_job', 
+            payload: { 
+                id, 
+                jobTitle: title, 
+                jobWage: parseInt(wage), 
+                storeName: name, 
+                storeAddress: address 
+            }
+        });
+        callback && callback();
+    };
+};
 
 
 
 export const { Context, Provider } = createDataContext(
     JobsReducer,
-    { getJobs, removeJob },
+    { getJobs, addJob, editJob, removeJob },
     []
 );
