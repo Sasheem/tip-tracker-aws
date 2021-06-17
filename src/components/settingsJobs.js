@@ -17,7 +17,6 @@ const SettingsJobs = ({ navigation }) => {
 	// context
 	const { state: fetchedJobs, getJobs } = useContext(JobsContext);
 	// state
-	const [jobs, setJobs] = useState([]);
 	const [deleteModal, setDeleteModal] = useState(false);
 	const [editModal, setEditModal] = useState(false);
 
@@ -26,7 +25,7 @@ const SettingsJobs = ({ navigation }) => {
 		getJobs();
 		// listen for when this component ViewCalendar gains focus or
         // becomes the primary component on the screen
-		const unsubscribe = navigation.addListener('focs', e => {
+		const unsubscribe = navigation.addListener('focus', e => {
 			console.log(`tab pressed getting shifts`);
 			getJobs();
 		})
