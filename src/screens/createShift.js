@@ -45,7 +45,7 @@ import CustomInput from '../components/common/customInput'
 
 const CreateShift = ({ route }) => {
 	// context
-	const { state: fetchedShifts } = useContext(ShiftsContext);
+	const { state: fetchedShifts, addShift } = useContext(ShiftsContext);
 	const { state: fetchedJobs, getJobs } = useContext(JobsContext);
 
 	// state
@@ -200,23 +200,8 @@ const CreateShift = ({ route }) => {
 			return setFormError(`Too many hours in a day`);
 		}
 
-		// send to context
-		// not being used right now
-		// addShift(date, amount, inTime, outTime, duration !== '' ? duration : hours, job, tags, () => console.log(`Shift added!`))
-
-		// prepare data
-		const input = {
-			createdAt: date,
-			amount,
-			inTime,
-			outTime,
-			hours: duration !== '' ? duration : hours,
-			job,
-			tags,
-		};
-
-		// write to backend
-		API.graphql(graphqlOperation(createShift, { input }));
+		// trigger addShift action - see ShiftsContext.js
+		addShift(date, amount, inTime, outTime, duration !== '' ? duration : hours, job, tags, () => console.log(`Shift added!`))
 
 		// clear the form data
 		setDate(moment().format('L'));
