@@ -12,36 +12,27 @@ import _ from 'lodash';
 import Swiper from 'react-native-swiper';
 
 import { Context as ShiftsContext } from '../context/ShiftsContext';
+import { Context as JobsContext } from '../context/JobsContext';
 
-import EditShift from './editShift';
+import FormShift from './formShift';
 import DeleteShift from './deleteShift';
 import ShiftTag from './shiftTag';
 
-const DetailFull = ({ currentDetail, jobs }) => {
-	const { removeShift } = useContext(ShiftsContext);
-	const shifts = Object.entries(currentDetail);
+const DetailFull = ({ currentDetail }) => {
+	const { state: fetchedJobs } = useContext(JobsContext);
+	const { editShift, removeShift } = useContext(ShiftsContext);
+	const shifts = _.values(currentDetail);
 	const [deleteModal, setDeleteModal] = useState(false);
 	const [editModal, setEditModal] = useState(false);
-	console.log(`shifts length: ${shifts.length}`);
 
-	const handleDeleteShift = () => {
-
+	const handleDeleteShift = (id) => {
 		// run delete action
-		removeShift(currentDetail[Object.keys(currentDetail)[0]].id);
+		removeShift(id);
 
 		// close modal
 		setDeleteModal(false);
 	};
 
-	const handleEditShift = () => {
-		// compare data to find diff values
-		// prepare input with this data
-
-		// save edit to backend
-
-		// close modal
-		setEditModal(false);
-	};
 	return (
 		<View style={{ flex: 1, flexDirection: `row` }}>
 			<View style={styles.detailSpacing} />
@@ -54,7 +45,7 @@ const DetailFull = ({ currentDetail, jobs }) => {
 						<Text style={{ color: `#016FB9`, textAlign: `right` }}>Edit</Text>
 					</TouchableOpacity>
 					<Text style={styles.headerText}>
-						{currentDetail[Object.keys(currentDetail)[0]].createdAt}
+						{!_.isEmpty(shifts) && shifts[0].createdAt}
 					</Text>
 					<TouchableOpacity
 						style={{ flex: 0.75 }}
@@ -66,9 +57,9 @@ const DetailFull = ({ currentDetail, jobs }) => {
 
 				<Swiper showsButtons={true}>
 					{_.map(shifts, (item) => {
-						const { id, amount, hours, tags, job } = item[1];
-						var jobResult = null;
-
+						const { id, amount, hours, tags, job } = item;
+						let jobResult;
+						
 						// calculate the hourly if it exists
 						var hourly =
 							(amount !== null) & (hours !== null)
@@ -77,7 +68,7 @@ const DetailFull = ({ currentDetail, jobs }) => {
 
 						// match job id to get job data
 						if (job !== null) {
-							jobResult = _.find(jobs, (jobItem) => jobItem.id === job);
+							jobResult = _.find(fetchedJobs, (jobItem) => jobItem.id === job);
 						}
 
 						return (
@@ -90,11 +81,26 @@ const DetailFull = ({ currentDetail, jobs }) => {
 									<View style={styles.centeredContainer}>
 										<View style={styles.modalContainer}>
 											<Text>Edit Shift</Text>
-											<EditShift
-												shift={item[1] ? item[1] : {}}
-												job={jobResult}
+											<FormShift 
+												labels={{
+													button: `Save`,
+												}}
+												initFormValue={item ? { ...item } : {}}
+												onSubmit={(dateShift, amountShift, hoursShift, inTimeShift, outTimeShift,  jobShift, tagsShift) => {
+													editShift(
+														id, 
+														dateShift, 
+														amountShift, 
+														hoursShift, 
+														inTimeShift, 
+														outTimeShift,  
+														jobShift, 
+														tagsShift, 
+														() => setEditModal(false) 
+													)
+												}}
+												isEdit={true}
 												setEditModal={setEditModal}
-												handleEditShift={handleEditShift}
 											/>
 										</View>
 									</View>
@@ -108,7 +114,7 @@ const DetailFull = ({ currentDetail, jobs }) => {
 										<View style={styles.modalContainer}>
 											<DeleteShift
 												setDeleteModal={setDeleteModal}
-												handleDeleteShift={handleDeleteShift}
+												handleDeleteShift={() => handleDeleteShift(id)}
 											/>
 										</View>
 									</View>
@@ -118,7 +124,7 @@ const DetailFull = ({ currentDetail, jobs }) => {
 										<Text>Amount</Text>
 										<Text>
 											$
-											{jobResult !== null && jobResult.jobWage > 5.54
+											{jobResult !== undefined && jobResult.jobWage > 5.54
 												? jobResult.jobWage * parseFloat(hours)
 												: amount}
 										</Text>
@@ -130,7 +136,7 @@ const DetailFull = ({ currentDetail, jobs }) => {
 									<View style={styles.rowItemFlexOne}>
 										<Text>Hourly</Text>
 										<Text>
-											{jobResult !== null && jobResult.jobWage > 5.54
+											{jobResult !== undefined && jobResult.jobWage > 5.54
 												? jobResult.jobWage
 												: hourly.toFixed(2)}{' '}
 											/hr
@@ -140,7 +146,7 @@ const DetailFull = ({ currentDetail, jobs }) => {
 								<View style={styles.bottomRow}>
 									<View style={{ flex: 1 }}>
 										<Text>Job</Text>
-										<Text>{jobResult !== null && jobResult.jobTitle}</Text>
+										<Text>{jobResult !== undefined && jobResult.jobTitle}</Text>
 									</View>
 									<View style={{ flex: 2 }}>
 										<Text>Tags</Text>
@@ -223,7 +229,7 @@ const styles = StyleSheet.create({
 		margin: 20,
 		backgroundColor: 'white',
 		borderRadius: 20,
-		padding: 35,
+		paddingTop: 35,
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: {
