@@ -1,7 +1,7 @@
 import createDataContext from './createDataContext'; 
 import { API, graphqlOperation } from 'aws-amplify';
 import { listShifts } from '../graphql/queries';
-import { createShift, deleteShift } from '../graphql/mutations'
+import { createShift, deleteShift, updateShift } from '../graphql/mutations'
 
 // reducer
 const shiftsReducer = (state, action) => {
@@ -42,7 +42,7 @@ const getShifts = dispatch => {
 };
 const addShift = () => {
     // not being used right now
-    return (date, amount, inTime, outTime, hours, job, tags, callback) => {
+    return async (date, amount, inTime, outTime, hours, job, tags, callback) => {
         // prepare data
 		const input = {
 			createdAt: date,
@@ -56,7 +56,7 @@ const addShift = () => {
 
         console.log(`Adding Shift: ${date}`);
 		// write to backend
-		API.graphql(graphqlOperation(createShift, { input }));
+		await API.graphql(graphqlOperation(createShift, { input }));
 
         // dispatch({ type: 'add_shift', payload: { input } });
         callback && callback();
@@ -74,10 +74,35 @@ const removeShift = dispatch => {
     };
 }
 const editShift = dispatch => {
-    return (id, createdAt, amount, inTime, outTime, hours, job, tags, user, callback) => {
+    return async (id, date, amount, hours, inTime, outTime, job, tags, callback) => {
+
+        // prepare data
+        const input = {
+            id,
+            createdAt: date,
+            amount,
+            hours, 
+            inTime, 
+            outTime, 
+            job,
+            tags, 
+        };
+
+        // update in backend
+        await API.graphql(graphqlOperation(updateShift, { input }));
+
         dispatch({ 
             type: 'edit_shift', 
-            payload: { id, createdAt, amount, inTime, outTime, hours, job, tags, user } 
+            payload: { 
+                id,
+                createdAt: date,
+                amount,
+                hours, 
+                inTime, 
+                outTime, 
+                job,
+                tags, 
+            } 
         });
         callback && callback();
     };
