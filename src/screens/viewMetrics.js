@@ -3,16 +3,12 @@ import {
 	StyleSheet,
 	Text,
 	View,
-	TouchableOpacity,
 	Platform,
 } from 'react-native';
-import { API, graphqlOperation } from 'aws-amplify';
 import moment from 'moment';
 import _ from 'lodash';
 import RNPickerSelect from 'react-native-picker-select';
 import { AntDesign } from '@expo/vector-icons';
-
-import { listJobs } from '../graphql/queries';
 
 import { Context as ShiftsContext } from '../context/ShiftsContext';
 import MetricComponent from '../components/metricComponent';
@@ -27,7 +23,6 @@ import SummaryMetric from '../components/summaryMetric';
 
 const ViewMetrics = () => {
 	const { state: fetchedShifts, getShifts } = useContext(ShiftsContext);
-	const [jobs, setJobs] = useState([]);
 	const [dailyLabel, setDailyLabel] = useState(moment().format('MM-DD-YYYY'));
 	const [daily, setDaily] = useState({});
 	const [weeklyLabel, setWeeklyLabel] = useState(moment().format('w'));
@@ -50,7 +45,6 @@ const ViewMetrics = () => {
 	// fetch shifts when component mounts and shifts state updates
 	useEffect(() => {
 		getShifts();
-		getJobs();
 	}, []);
 
 	/**
@@ -94,7 +88,7 @@ const ViewMetrics = () => {
 		if (fetchedShifts.length !== 0) {
 			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt);
 			_.map(_.reverse(sortedShifts), (shift) => {
-				var tempWeek = moment(shift.createdAt, 'MM-DD-YYYY').format('w');
+				var tempWeek = moment(new Date(shift.createdAt), 'MM-DD-YYYY').format('w');
 
 				if (weeklyStrings.length === 0) {
 					weeklyStrings.push(`Week ${tempWeek}`);
@@ -124,8 +118,9 @@ const ViewMetrics = () => {
 			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt);
 
 			_.map(_.reverse(sortedShifts), (shift) => {
-				var tempMonth = moment(shift.createdAt, 'MM-DD-YYYY').format('MMMM');
-				var tempYear = moment(shift.createdAt, 'MM-DD-YYYY').format('YYYY');
+				let date = new Date(shift.createdAt)
+				var tempMonth = moment(date, 'MM-DD-YYYY').format('MMMM');
+				var tempYear = moment(date, 'MM-DD-YYYY').format('YYYY');
 
 				if (monthlyStrings.length === 0) {
 					monthlyStrings.push(tempMonth);
@@ -156,7 +151,8 @@ const ViewMetrics = () => {
 		if (fetchedShifts.length !== 0) {
 			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt);
 			_.map(_.reverse(sortedShifts), (shift) => {
-				var tempYear = moment(shift.createdAt, 'MM-DD-YYYY').format('YYYY');
+				let date = new Date(shift.createdAt);
+				var tempYear = moment(date, 'MM-DD-YYYY').format('YYYY');
 
 				if (yearlyStrings.length === 0) {
 					yearlyStrings.push(tempYear);
@@ -227,8 +223,9 @@ const ViewMetrics = () => {
 
 	// filter metrics based on day with momentjs
 	useEffect(() => {
+		// POSSIBLE ERROR
 		const result = _.filter(fetchedShifts, (shift) =>
-			moment(dailyLabel, 'MM-DD-YYYY').isSame(shift.createdAt, 'day')
+			moment(new Date(dailyLabel)).isSame(new Date(shift.createdAt), 'day')
 		);
 		setDaily({ ...result[0] });
 	}, [fetchedShifts, dailyLabel]);
@@ -247,12 +244,14 @@ const ViewMetrics = () => {
 		var totalHours = 0.0;
 		var totalHourly = 0.0;
 		const results = _.filter(fetchedShifts, (shift) => {
+			// POSSIBLE ERROR
 			// using == because one is a number and other is string, respectively
-			return weeklyLabel == moment(shift.createdAt, 'MM-DD-YYYY').week();
+			return weeklyLabel == moment(new Date(shift.createdAt)).week();
 		});
 
 		if (results.length !== 0) {
-			var weekNumber = moment(results[0].createdAt, 'MM-DD-YYYY').format('w');
+			let date = new Date(results[0].createdAt);
+			var weekNumber = moment(date, 'MM-DD-YYYY').format('w');
 
 			_.map(results, (shift) => {
 				let amount = parseFloat(shift.amount !== '' ? shift.amount : '0.0');
@@ -280,8 +279,9 @@ const ViewMetrics = () => {
 	// filter metrics based on month with momentjs
 	useEffect(() => {
 		const results = _.filter(fetchedShifts, (shift) => {
-			let monthTemp = moment(shift.createdAt).format('MMMM');
-			let yearTemp = moment(shift.createdAt).format('YYYY');
+			let date = new Date(shift.createdAt);
+			let monthTemp = moment(date).format('MMMM');
+			let yearTemp = moment(date).format('YYYY');
 			return monthTemp === monthlyMonthLabel && yearTemp == monthlyYearLabel;
 		});
 		setMonthly(calculate(results));
@@ -289,8 +289,9 @@ const ViewMetrics = () => {
 
 	// filter metrics based on year with momentjs
 	useEffect(() => {
+		// POSSIBLE ERROR
 		const results = _.filter(fetchedShifts, (shift) =>
-			moment(yearlyLabel, 'YYYY').isSame(shift.createdAt, 'year')
+			moment(new Date(yearlyLabel)).isSame(new Date(shift.createdAt), 'year')
 		);
 		setYearly(calculate(results));
 	}, [fetchedShifts, yearlyLabel]);
@@ -319,12 +320,6 @@ const ViewMetrics = () => {
 			hours: totalHours.toFixed(1),
 			hourly: totalHourly.toFixed(1),
 		};
-	};
-
-	// helper function - fetch jobs
-	const getJobs = async () => {
-		const result = await API.graphql(graphqlOperation(listJobs));
-		setJobs(result.data.listJobs.items);
 	};
 
 	// helper function - set monthly
