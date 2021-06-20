@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { Auth } from 'aws-amplify';
 import { AntDesign } from '@expo/vector-icons';
+import _ from 'lodash';
 
 // mockup
 const Settings = ({ navigation }) => {
+	const [userInfo, setUserInfo] = useState({});
+	// load user info from backend
+	useEffect(() => {
+		try {
+			fetchUser();
+		} catch(err) {
+			console.log(`error: ${err}`);
+		}
+	}, []);
+
+	const fetchUser = async () => {
+		const result = await Auth.currentUserInfo();
+		setUserInfo(result);
+	}
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.userInfoContainer}>
-				<Text style={styles.subtitleLg}>User Name</Text>
-				<Text>user email</Text>
+				<Text style={styles.subtitleLg}>User account</Text>
+				{!_.isEmpty(userInfo) && <Text>{userInfo.attributes.email}</Text>}
+				{console.log(userInfo)}
 			</View>
 			<View style={styles.settingsContainer}>
 				<Text style={styles.subtitleMd}>Settings</Text>
