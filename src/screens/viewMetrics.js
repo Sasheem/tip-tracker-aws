@@ -15,10 +15,8 @@ import MetricComponent from '../components/metricComponent';
 import SummaryMetric from '../components/summaryMetric';
 
 /**
- * todo finish filling in dummy data for Summary Metrics UI
- * todo plan out the different algorithms needed to calculate each metric
- * ? Summary Metrics: account for data changing based on a variable for
- * ? Top Metrics: account for updates to shift via subscriptions
+ * 
+ * @returns render stats about shifts from context
  */
 
 const ViewMetrics = () => {
@@ -55,14 +53,14 @@ const ViewMetrics = () => {
 		var daily = [];
 
 		if (fetchedShifts.length !== 0) {
-			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt);
+			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt).sort((a, b) => moment(new Date(a.createdAt)).isBefore(new Date(b.createdAt), 'day'));
 			console.log(
 				`setting to last shift in sortedShifts: ${JSON.stringify(
 					sortedShifts[sortedShifts.length - 1]
 				)}`
 			);
 
-			_.map(_.reverse(sortedShifts), (shift) => {
+			_.map(sortedShifts, (shift) => {
 				if (shift.amount) {
 					daily.push({
 						label: `${shift.createdAt}`,
@@ -77,28 +75,32 @@ const ViewMetrics = () => {
 		setDailyItems(daily);
 	}, [fetchedShifts]);
 
-	/**
-	 * todo pair the corresponding date range in the week label
-	 */
 	// set up weekly items array for RNPickerSelect
 	useEffect(() => {
 		var weekly = [];
 		var weeklyStrings = [];
+		let first;
+		let last;
 
 		if (fetchedShifts.length !== 0) {
-			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt);
-			_.map(_.reverse(sortedShifts), (shift) => {
+			const sortedShifts = _.sortBy(fetchedShifts, shift => shift.createdAt).sort((a, b) => moment(new Date(a.createdAt)).isBefore(new Date(b.createdAt), 'day'));
+
+			_.map(sortedShifts, (shift) => {
 				var tempWeek = moment(new Date(shift.createdAt), 'MM-DD-YYYY').format('w');
 
 				if (weeklyStrings.length === 0) {
+					first = moment(shift.createdAt, 'MM-DD-YYYY').format('MM/DD/YY');
+					last = moment(shift.createdAt, 'MM-DD-YYYY').add(7, 'day').format('MM/DD/YY');
 					weeklyStrings.push(`Week ${tempWeek}`);
-					weekly.push({ label: `Week ${tempWeek}`, value: tempWeek });
+					weekly.push({ label: `Week ${tempWeek} (${first} - ${last})`, value: tempWeek });
 				} else {
 					// check if tempWeek is NOT within weekly already
 					if (!weeklyStrings.includes(`Week ${tempWeek}`)) {
+						first = moment(new Date(shift.createdAt), 'MM-DD-YYYY').format('MM/DD/YY');
+						last = moment(new Date(shift.createdAt), 'MM-DD-YYYY').add(7, 'day').format('MM/DD/YY');
 						weeklyStrings.push(`Week ${tempWeek}`);
 						weekly.push({
-							label: `Week ${tempWeek}`,
+							label: `Week ${tempWeek} (${first} - ${last})`,
 							value: tempWeek,
 						});
 					}
@@ -115,9 +117,9 @@ const ViewMetrics = () => {
 
 		// only perform if shifts is not empty
 		if (fetchedShifts.length !== 0) {
-			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt);
+			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt).reverse();
 
-			_.map(_.reverse(sortedShifts), (shift) => {
+			_.map(sortedShifts, (shift) => {
 				let date = new Date(shift.createdAt)
 				var tempMonth = moment(date, 'MM-DD-YYYY').format('MMMM');
 				var tempYear = moment(date, 'MM-DD-YYYY').format('YYYY');
@@ -149,8 +151,8 @@ const ViewMetrics = () => {
 		var yearlyStrings = [];
 
 		if (fetchedShifts.length !== 0) {
-			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt);
-			_.map(_.reverse(sortedShifts), (shift) => {
+			const sortedShifts = _.sortBy(fetchedShifts, (shift) => shift.createdAt).reverse();
+			_.map(sortedShifts, (shift) => {
 				let date = new Date(shift.createdAt);
 				var tempYear = moment(date, 'MM-DD-YYYY').format('YYYY');
 
@@ -223,7 +225,6 @@ const ViewMetrics = () => {
 
 	// filter metrics based on day with momentjs
 	useEffect(() => {
-		// POSSIBLE ERROR
 		const result = _.filter(fetchedShifts, (shift) =>
 			moment(new Date(dailyLabel)).isSame(new Date(shift.createdAt), 'day')
 		);
@@ -235,16 +236,12 @@ const ViewMetrics = () => {
 	 * todo - 1) Does not yet handle case for hourly based job
 	 * ? repeating code from calculate() b/c I an extra attr
 	 * ? is for week label
-	 *
-	 * todo - 2) filter by year, I don't see it now but it will overlap the years
-	 * todo - when november/december come around
 	 */
 	useEffect(() => {
 		var totalAmount = 0.0;
 		var totalHours = 0.0;
 		var totalHourly = 0.0;
 		const results = _.filter(fetchedShifts, (shift) => {
-			// POSSIBLE ERROR
 			// using == because one is a number and other is string, respectively
 			return weeklyLabel == moment(new Date(shift.createdAt)).week();
 		});
@@ -289,9 +286,8 @@ const ViewMetrics = () => {
 
 	// filter metrics based on year with momentjs
 	useEffect(() => {
-		// POSSIBLE ERROR
 		const results = _.filter(fetchedShifts, (shift) =>
-			moment(new Date(yearlyLabel)).isSame(new Date(shift.createdAt), 'year')
+			moment(yearlyLabel).isSame(new Date(shift.createdAt), 'year')
 		);
 		setYearly(calculate(results));
 	}, [fetchedShifts, yearlyLabel]);
@@ -338,10 +334,10 @@ const ViewMetrics = () => {
 			{/* Top metrics */}
 			<View>
 				{/* Top Row */}
-				<Text style={styles.title}>Top Metrics</Text>
+				<Text style={styles.title}>Best</Text>
 				<View style={styles.flexRow}>
 					<MetricComponent
-						title='Earnings'
+						title='Income'
 						value={`$${topAmount.amount}`}
 						date={`${topAmount.createdAt}`}
 					/>
@@ -358,12 +354,12 @@ const ViewMetrics = () => {
 						date={`${topHours.createdAt}`}
 					/>
 				</View>
-
+				
 				{/* Lifetime Row */}
-				<Text style={styles.title}>Lifetime Metrics</Text>
+				<Text style={styles.title}>Lifetime</Text>
 				<View style={styles.flexRow}>
 					<MetricComponent
-						title='Earnings'
+						title='Income'
 						value={`$${lifetime.amount}`}
 						date={null}
 					/>
@@ -376,8 +372,9 @@ const ViewMetrics = () => {
 
 			{/* Summary metrics */}
 			<View>
-				<Text style={styles.title}>Summary</Text>
+				<Text style={styles.title}>Stats Breakdown</Text>
 				{/* Daily */}
+				{/* <Text style={styles.subtitle}>Toggle day</Text> */}
 				<View style={styles.summaryBlock}>
 					<RNPickerSelect
 						placeholder={{
@@ -408,6 +405,7 @@ const ViewMetrics = () => {
 				</View>
 
 				{/* Weekly */}
+				{/* <Text style={styles.subtitle}>Toggle week</Text> */}
 				<View style={styles.summaryBlock}>
 					<View>
 						<RNPickerSelect
@@ -436,6 +434,7 @@ const ViewMetrics = () => {
 				</View>
 
 				{/* Monthly */}
+				{/* <Text style={styles.subtitle}>Toggle month</Text> */}
 				<View style={styles.summaryBlock}>
 					<RNPickerSelect
 						placeholder={{
@@ -449,7 +448,7 @@ const ViewMetrics = () => {
 						Icon={() => <AntDesign name='down' size={20} color='#D1D5DE' />}
 						style={pickerStyles}
 					/>
-					{monthly.hourly && monthly.hourly !== NaN && (
+					{monthly.hourly && (
 						<View style={styles.flexRow}>
 							<SummaryMetric title='Earnings' value={`$${monthly.amount}`} />
 							<View style={styles.flexFillSm} />
@@ -461,6 +460,7 @@ const ViewMetrics = () => {
 				</View>
 
 				{/* Yearly */}
+				{/* <Text style={styles.subtitle}>Toggle year</Text> */}
 				<View style={styles.summaryBlock}>
 					<RNPickerSelect
 						placeholder={{
@@ -501,8 +501,11 @@ const styles = StyleSheet.create({
 		textAlign: `left`,
 	},
 	title: {
-		fontSize: 16,
+		fontSize: 20,
 		fontWeight: `500`,
+	},
+	subtitle: {
+		fontSize: 16,
 	},
 	flexRow: {
 		flexDirection: `row`,
