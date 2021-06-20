@@ -36,10 +36,10 @@ const SettingsStorage = () => {
             <View style={styles.row}>
                 <Text style={styles.subtitle}>Local data</Text>
                 <Text style={styles.desc}>Sync up your local data with cloud data to keep your shifts up to date in your calendar.</Text>
-                <Button label='Sync' onPress={onSyncPress} customStyle={{ alignSelf: `flex-end` }} />
+                {/* <Button label='Sync' onPress={onSyncPress} customStyle={{ alignSelf: `flex-end` }} /> */}
             </View>
             
-            <View style={styles.fillerLg} />
+            <View style={styles.fillerMd} />
         </View>
     );
 }
@@ -70,8 +70,8 @@ const styles = StyleSheet.create({
         flex: 1,
         width: `100%`,
     },
-    fillerLg: {
-        flex: 4,
+    fillerMd: {
+        flex: 2,
     },
     importContainer: {
         flex: 1,
