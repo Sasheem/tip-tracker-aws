@@ -13,7 +13,6 @@ import {
 	SafeAreaView,
 	ScrollView,
 } from 'react-native';
-import { API, graphqlOperation } from 'aws-amplify';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import _ from 'lodash';
