@@ -250,7 +250,7 @@ const CreateShift = ({ route }) => {
 							{/* Amount Earned */}
 							<View style={styles.rowComponent}>
 								<CustomInput 
-									label='Earnings' 
+									label='Income' 
 									placeholder='$0.00' 
 									customInputStyle={styles.earningsIOS} 
 									onChangeText={(text) => onAmountChange(text)} 
