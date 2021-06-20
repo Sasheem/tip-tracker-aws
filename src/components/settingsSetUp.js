@@ -134,7 +134,7 @@ const SettingsSetUp = () => {
                     style={{ alignSelf: `flex-end` }}
                 />
             </View>
-            <View style={styles.fillerLarge} />
+            <View style={styles.fillerMd} />
         </View>
     );
 }
@@ -145,8 +145,7 @@ const styles = StyleSheet.create({
 		paddingLeft: 24,
 		paddingRight: 24,
 		alignItems: `flex-start`,
-        flex: 2,
-        
+        flex: 1,
 	},
     column: {
         flex: 1,
@@ -157,8 +156,8 @@ const styles = StyleSheet.create({
         flex: 1,
         marginTop: 20,
     },
-    fillerLarge: {
-        flex: 4,
+    fillerMd: {
+        flex: 2,
     },
     subtitle: {
         fontSize: 20,

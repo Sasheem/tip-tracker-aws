@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
 		flex: 4,
 	},
 	fillerMd: {
-		flex: 2.5,
+		flex: 2,
 	},
 	buttonContainer: {
 		flex: 1,
