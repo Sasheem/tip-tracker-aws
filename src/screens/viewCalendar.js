@@ -10,6 +10,7 @@ import { API, graphqlOperation } from 'aws-amplify';
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
 import _ from 'lodash';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 import { listJobs } from '../graphql/queries';
@@ -26,6 +27,7 @@ const ViewCalendar = ({ navigation }) => {
 	const [jobs, setJobs] = useState([]);
 	const [currentDetail, setCurrentDetail] = useState({});
 	const [currentDate, setCurrentDate] = useState('');
+	const [dailyGoal, setDailyGoal] = useState('0');
 
 	// fetch shifts when component mounts and shifts state updates
 	useEffect(() => {
@@ -33,7 +35,7 @@ const ViewCalendar = ({ navigation }) => {
 		getShifts();
 		console.log(`fetching jobs`);
 		getJobs();
-
+		fetchSettings();
 		// listen for when this component ViewCalendar gains focus or
         // becomes the primary component on the screen
 		const unsubscribe = navigation.addListener('tabPress', e => {
@@ -64,6 +66,13 @@ const ViewCalendar = ({ navigation }) => {
 		const result = await API.graphql(graphqlOperation(listJobs));
 		setJobs(result.data.listJobs.items);
 	};
+
+	// helper function - fetch local storage settings
+    const fetchSettings = async () => {
+        // fetch settings
+        let daily = await AsyncStorage.getItem('@Settings_dailyGoal');
+        daily !== undefined ? setDailyGoal(daily) : console.log('No saved daily to load');
+    }
 
 	// helper function - handle state for full cell selected
 	const handleFullDaySelected = (currentDetail, date) => {
@@ -102,7 +111,7 @@ const ViewCalendar = ({ navigation }) => {
 			hourly = amount / hours;
 
 			return (
-				<View>
+				<View style={{ backgroundColor: parseInt(dailyGoal) > hourly ? `white` : `rgba(6,214,160,.2)`}}>
 					<TouchableOpacity onPress={() => setCurrentDetail({ ...results })}>
 						<Text
 							style={{
