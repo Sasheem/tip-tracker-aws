@@ -24,7 +24,7 @@ const Settings = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.userInfoContainer}>
-				<Text style={styles.subtitleLg}>User account</Text>
+				<Text style={styles.subtitleLg}>Username</Text>
 				{!_.isEmpty(userInfo) && <Text>{userInfo.attributes.email}</Text>}
 				{console.log(userInfo)}
 			</View>
