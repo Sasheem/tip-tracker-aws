@@ -8,7 +8,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#06D6A0"
+      "backgroundColor": "#39A0ED"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -28,7 +28,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "description": "Tip tracking app useful for users working in the hospitality industry. Helps users keep track of earnings, wages, and hours worked over time. Calculates useful metrics for user based on their input.",
+    "description": "Track tips and wages earned working in the hospitality industry. Users can view averages and statistics over time about the data they submit. ",
     "githubUrl": "https://github.com/Sasheem/tip-tracker-aws"
   }
 }
