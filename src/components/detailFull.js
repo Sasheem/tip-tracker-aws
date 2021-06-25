@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
 	StyleSheet,
 	View,
@@ -17,13 +17,31 @@ import { Context as JobsContext } from '../context/JobsContext';
 import FormShift from './formShift';
 import DeleteShift from './deleteShift';
 import ShiftTag from './shiftTag';
+import DetailContent from './detailContent';
 
-const DetailFull = ({ currentDetail }) => {
+const DetailFull = ({ currentDetail, jobs }) => {
+	// context
 	const { state: fetchedJobs } = useContext(JobsContext);
 	const { editShift, removeShift } = useContext(ShiftsContext);
-	const shifts = _.values(currentDetail);
+
+	// state
+	// const shifts = _.values(currentDetail);
 	const [deleteModal, setDeleteModal] = useState(false);
 	const [editModal, setEditModal] = useState(false);
+
+	 // state
+	 const [shift, setShift] = useState({});
+	 const [shifts, setShifts] = useState([]);
+
+	 // load state with single shift if only 1 exists
+	 useEffect(() => {
+		 const result = _.values(currentDetail);
+		 setShifts(result);
+
+		 if (result.length === 1) {
+			 setShift({ ...result[0] })
+		 }
+	 }, [currentDetail]);
 
 	const handleDeleteShift = (id) => {
 		// run delete action
@@ -54,117 +72,127 @@ const DetailFull = ({ currentDetail }) => {
 						<Text style={{ color: `red`, textAlign: `left` }}>Delete</Text>
 					</TouchableOpacity>
 				</View>
+				{console.log(shifts)}
+				{shifts.length === 1 
+					? <DetailContent 
+						shift={shift}
+						jobs={jobs}
+						editModal={editModal}
+						setEditModal={setEditModal}
+						deleteModal={deleteModal}
+						setDeleteModal={setDeleteModal}
+						handleDeleteShift={handleDeleteShift}
+						/> 
+					: <Swiper showsButtons={true}>
+						{_.map(shifts, (item) => {
+							const { id, amount, hours, tags, job } = item;
+							let jobResult;
+							
+							// calculate the hourly if it exists
+							var hourly =
+								(amount !== null) & (hours !== null)
+									? parseFloat(amount) / parseFloat(hours)
+									: 0.0;
 
-				<Swiper showsButtons={true}>
-					{_.map(shifts, (item) => {
-						const { id, amount, hours, tags, job } = item;
-						let jobResult;
-						
-						// calculate the hourly if it exists
-						var hourly =
-							(amount !== null) & (hours !== null)
-								? parseFloat(amount) / parseFloat(hours)
-								: 0.0;
+							// match job id to get job data
+							if (job !== undefined) {
+								jobResult = _.find(fetchedJobs, (jobItem) => jobItem.id === job);
+							}
 
-						// match job id to get job data
-						if (job !== null) {
-							jobResult = _.find(fetchedJobs, (jobItem) => jobItem.id === job);
-						}
-
-						return (
-							<View key={id} style={styles.content}>
-								<Modal
-									animationType='slide'
-									transparent={true}
-									visible={editModal}
-								>
-									<View style={styles.centeredContainer}>
-										<View style={styles.modalContainer}>
-											<Text>Edit Shift</Text>
-											<FormShift 
-												labels={{
-													button: `Save`,
-												}}
-												initFormValue={item ? { ...item } : {}}
-												onSubmit={(dateShift, amountShift, hoursShift, inTimeShift, outTimeShift,  jobShift, tagsShift) => {
-													editShift(
-														id, 
-														dateShift, 
-														amountShift, 
-														hoursShift, 
-														inTimeShift, 
-														outTimeShift,  
-														jobShift, 
-														tagsShift, 
-														() => setEditModal(false) 
-													)
-												}}
-												isEdit={true}
-												setEditModal={setEditModal}
-											/>
+							return (
+								<View key={id} style={styles.content}>
+									<Modal
+										animationType='slide'
+										transparent={true}
+										visible={editModal}
+									>
+										<View style={styles.centeredContainer}>
+											<View style={styles.modalContainer}>
+												<Text>Edit Shift</Text>
+												<FormShift 
+													labels={{
+														button: `Save`,
+													}}
+													initFormValue={item ? { ...item } : {}}
+													onSubmit={(dateShift, amountShift, hoursShift, inTimeShift, outTimeShift,  jobShift, tagsShift) => {
+														editShift(
+															id, 
+															dateShift, 
+															amountShift, 
+															hoursShift, 
+															inTimeShift, 
+															outTimeShift,  
+															jobShift, 
+															tagsShift, 
+															() => setEditModal(false) 
+														)
+													}}
+													isEdit={true}
+													setEditModal={setEditModal}
+												/>
+											</View>
+										</View>
+									</Modal>
+									<Modal
+										animationType='slide'
+										transparent={true}
+										visible={deleteModal}
+									>
+										<View style={styles.centeredContainer}>
+											<View style={styles.modalContainer}>
+												<DeleteShift
+													setDeleteModal={setDeleteModal}
+													handleDeleteShift={() => handleDeleteShift(id)}
+												/>
+											</View>
+										</View>
+									</Modal>
+									<View style={styles.topRow}>
+										<View style={styles.rowItemFlexOne}>
+											<Text>Amount</Text>
+											<Text>
+												$
+												{jobResult !== undefined && jobResult.jobWage > 5.54
+													? jobResult.jobWage * parseFloat(hours)
+													: amount}
+											</Text>
+										</View>
+										<View style={styles.rowItemFlexOne}>
+											<Text>Hours</Text>
+											<Text>{hours !== null && hours}</Text>
+										</View>
+										<View style={styles.rowItemFlexOne}>
+											<Text>Hourly</Text>
+											<Text>
+												{jobResult !== undefined && jobResult.jobWage > 5.54
+													? jobResult.jobWage
+													: hourly.toFixed(2)}{' '}
+												/hr
+											</Text>
 										</View>
 									</View>
-								</Modal>
-								<Modal
-									animationType='slide'
-									transparent={true}
-									visible={deleteModal}
-								>
-									<View style={styles.centeredContainer}>
-										<View style={styles.modalContainer}>
-											<DeleteShift
-												setDeleteModal={setDeleteModal}
-												handleDeleteShift={() => handleDeleteShift(id)}
-											/>
+									<View style={styles.bottomRow}>
+										<View style={{ flex: 1 }}>
+											<Text>Job</Text>
+											<Text>{jobResult !== undefined && jobResult.jobTitle}</Text>
+										</View>
+										<View style={{ flex: 2 }}>
+											<Text>Tags</Text>
+											<SafeAreaView>
+												<ScrollView horizontal={true}>
+													{_.map(tags, (tag) => {
+														return (
+															<ShiftTag key={tag} text={tag} forDetail={true} />
+														);
+													})}
+												</ScrollView>
+											</SafeAreaView>
 										</View>
 									</View>
-								</Modal>
-								<View style={styles.topRow}>
-									<View style={styles.rowItemFlexOne}>
-										<Text>Amount</Text>
-										<Text>
-											$
-											{jobResult !== undefined && jobResult.jobWage > 5.54
-												? jobResult.jobWage * parseFloat(hours)
-												: amount}
-										</Text>
-									</View>
-									<View style={styles.rowItemFlexOne}>
-										<Text>Hours</Text>
-										<Text>{hours !== null && hours}</Text>
-									</View>
-									<View style={styles.rowItemFlexOne}>
-										<Text>Hourly</Text>
-										<Text>
-											{jobResult !== undefined && jobResult.jobWage > 5.54
-												? jobResult.jobWage
-												: hourly.toFixed(2)}{' '}
-											/hr
-										</Text>
-									</View>
 								</View>
-								<View style={styles.bottomRow}>
-									<View style={{ flex: 1 }}>
-										<Text>Job</Text>
-										<Text>{jobResult !== undefined && jobResult.jobTitle}</Text>
-									</View>
-									<View style={{ flex: 2 }}>
-										<Text>Tags</Text>
-										<SafeAreaView>
-											<ScrollView horizontal={true}>
-												{_.map(tags, (tag) => {
-													return (
-														<ShiftTag key={tag} text={tag} forDetail={true} />
-													);
-												})}
-											</ScrollView>
-										</SafeAreaView>
-									</View>
-								</View>
-							</View>
-						);
-					})}
-				</Swiper>
+							);
+						})}
+					</Swiper>}
 			</View>
 			<View style={styles.detailSpacing} />
 		</View>
