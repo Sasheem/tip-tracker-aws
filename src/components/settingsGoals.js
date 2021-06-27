@@ -77,9 +77,9 @@ const SettingsGoals = () => {
     
     return (
         <View style={styles.container}>
-            <Text style={styles.subtitle}>Tip Goals</Text>
             <CustomInput
-                label='Daily' 
+                label='Daily'
+                desc='Add or change your hourly goal for the day. Indicated in Calendar and Metrics tab.'
                 placeholder='$0.00'
                 value={dailyGoal}
                 onChangeText={(text) => onDailyChange(text)}
@@ -87,7 +87,8 @@ const SettingsGoals = () => {
                 keyboardType='decimal-pad'
             /> 
             <CustomInput
-                label='Weekly' 
+                label='Weekly'
+                desc='Add or change your total income goal for the week. Indicated in Metrics tab only.'
                 placeholder='$0.00'
                 value={weeklyGoal}
                 onChangeText={(text) => onWeeklyChange(text)}
@@ -96,6 +97,7 @@ const SettingsGoals = () => {
             />
             <CustomInput
                 label='Monthly' 
+                desc='Add or change your total income goal for the month. Indicated in Metrics tab only.'
                 placeholder='$0.00'
                 value={monthlyGoal}
                 onChangeText={(text) => onMonthlyChange(text)}
