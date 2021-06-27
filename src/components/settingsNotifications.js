@@ -29,7 +29,7 @@ const SettingsNotifications = () => {
         <View style={styles.container}>
             <View style={styles.row}>
                 <Text style={styles.label}>Notification reminder</Text>
-                <Text style={styles.desc}>Set up notification reminders to add your shifts</Text>
+                <Text style={styles.desc}>Turn on/off shift reminders in case you forget to add a shift.</Text>
                 <Switch
                     trackColor={{ false: '#767577', true: '#39A0ED' }}
                     thumbColor='#f4f3f4'
@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 18,
+        fontWeight: `500`,
         paddingTop: 5,
 		paddingBottom: 5,
 		borderBottomWidth: 0.5,
