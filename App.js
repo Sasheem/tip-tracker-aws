@@ -22,7 +22,8 @@ import ViewCalendar from './src/screens/viewCalendar';
 import ViewMetrics from './src/screens/viewMetrics';
 import ViewSettings from './src/screens/viewSettings';
 import SettingsAccount from './src/components/settingsAccount';
-import SettingsSetUp from './src/components/settingsSetUp';
+import SettingsGoals from './src/components/settingsGoals';
+import SettingsNotifications from './src/components/settingsNotifications';
 import SettingsJobs from './src/components/settingsJobs';
 import SettingsStorage from './src/components/settingsStorage';
 import CreateJob from './src/components/createJob';
@@ -59,8 +60,9 @@ const SettingsStackScreen = ({ navigation }) => {
 		<SettingsStack.Navigator>
 			<SettingsStack.Screen name='Settings' component={ViewSettings} />
 			<SettingsStack.Screen name='Account' component={SettingsAccount} />
-			<SettingsStack.Screen name='Set_Up' component={SettingsSetUp} options={{ title: `Set Up`}} />
 			<SettingsStack.Screen name='Jobs' component={RootJobsScreen} />
+			<SettingsStack.Screen name='Goals' component={SettingsGoals} />
+			<SettingsStack.Screen name='Notifications' component={SettingsNotifications} />
 			<SettingsStack.Screen name='Storage' component={SettingsStorage} />
 		</SettingsStack.Navigator>
 	);

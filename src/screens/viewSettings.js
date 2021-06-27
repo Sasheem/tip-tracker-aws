@@ -42,19 +42,28 @@ const Settings = ({ navigation }) => {
 				<TouchableOpacity
 					style={styles.row}
 					onPress={() => {
-						navigation.navigate('Set_Up');
+						navigation.navigate('Jobs');
 					}}
 				>
-					<Text>Set Up</Text>
+					<Text>Jobs</Text>
 					<AntDesign name='right' size={24} color='black' />
 				</TouchableOpacity>
 				<TouchableOpacity
 					style={styles.row}
 					onPress={() => {
-						navigation.navigate('Jobs');
+						navigation.navigate('Goals');
 					}}
 				>
-					<Text>Jobs</Text>
+					<Text>Goals</Text>
+					<AntDesign name='right' size={24} color='black' />
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={styles.row}
+					onPress={() => {
+						navigation.navigate('Notifications');
+					}}
+				>
+					<Text>Notifications</Text>
 					<AntDesign name='right' size={24} color='black' />
 				</TouchableOpacity>
 				<TouchableOpacity

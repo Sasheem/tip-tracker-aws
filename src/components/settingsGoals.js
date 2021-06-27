@@ -6,12 +6,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomInput from './common/customInput';
 import CustomButton from './common/customButton';
 
-const SettingsSetUp = () => {
+const SettingsGoals = () => {
 	const [dailyGoal, setDailyGoal] = useState('');
 	const [weeklyGoal, setWeeklyGoal] = useState('');
 	const [monthlyGoal, setMonthlyGoal] = useState('');
 	const [goalsError, setGoalsError] = useState('');
-    const [remindersEnabled, setRemindersEnabled] = useState(false);
 
     // component did mount
     useEffect(() => {
@@ -25,12 +24,10 @@ const SettingsSetUp = () => {
         let daily = await AsyncStorage.getItem('@Settings_dailyGoal');
         let weekly = await AsyncStorage.getItem('@Settings_weeklyGoal');
         let monthly = await AsyncStorage.getItem('@Settings_monthlyGoal');
-        let enabled = await AsyncStorage.getItem('@Settings_remindersEnabled');
         
         daily !== undefined ? setDailyGoal(daily) : console.log('No saved daily to load');
         weekly !== undefined ? setWeeklyGoal(weekly) : console.log('No saved weekly to load');
         monthly !== undefined ? setMonthlyGoal(monthly) : console.log('No saved monthly to load');
-        enabled !== undefined ? setRemindersEnabled(Boolean(parseInt(enabled))) : console.log('No saved remindersEnabled to load');
     }
 
 	// form controlled functions
@@ -46,12 +43,6 @@ const SettingsSetUp = () => {
 		setMonthlyGoal(text);
 		setGoalsError('');
 	}
-
-    const toggleRemindersAsyncStorage = async () => {
-        setRemindersEnabled(remindersEnabled => !remindersEnabled);
-        let remindersAsString = !remindersEnabled === false ? '0' : '1';
-        await AsyncStorage.setItem('@Settings_remindersEnabled', remindersAsString);
-    }
 
     // save goal settings
     const onSave = async () => {
@@ -84,7 +75,6 @@ const SettingsSetUp = () => {
         return number < 0 ? false : true;
     }
     
-
     return (
         <View style={styles.container}>
             <Text style={styles.subtitle}>Tip Goals</Text>
@@ -122,18 +112,6 @@ const SettingsSetUp = () => {
                     <Text style={styles.error}>{goalsError}</Text>
                 </View>
             }
-            <View style={styles.row}>
-                <Text style={styles.label}>Notification reminder</Text>
-                <Text style={styles.desc}>Set up notification reminders to add your shifts</Text>
-                <Switch
-                    trackColor={{ false: '#767577', true: '#39A0ED' }}
-                    thumbColor='#f4f3f4'
-                    ios_backgroundColor='#3e3e3e'
-                    onValueChange={toggleRemindersAsyncStorage}
-                    value={remindersEnabled}
-                    style={{ alignSelf: `flex-end` }}
-                />
-            </View>
             <View style={styles.fillerMd} />
         </View>
     );
@@ -181,4 +159,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SettingsSetUp;
+export default SettingsGoals;
