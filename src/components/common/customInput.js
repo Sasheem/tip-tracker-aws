@@ -1,19 +1,24 @@
 import React from 'react';
-import { StyleSheet, View, Text, TextInput } from 'react-native';
+import { StyleSheet, View, Text, TextInput, useColorScheme } from 'react-native';
 
 export default function CustomInput({ customInputStyle, label, desc, placeholder, value, onChangeText, returnKeyType, keyboardType, secureTextEntry }) {
+    const colorScheme = useColorScheme();
+    const themeTextStyle = colorScheme === 'light' ? styles.lightThemeText : styles.darkThemeText;
+	const themeBorderStyle = colorScheme === 'light' ? styles.lightThemeBorder : styles.darkThemeBorder;
+
     return (
         <View style={styles.container}> 
-            <Text style={styles.label}>{label}</Text>
-            {desc && <Text style={styles.desc}>{desc}</Text>}
+            <Text style={[styles.label, themeTextStyle]}>{label}</Text>
+            {desc && <Text style={[styles.desc, themeTextStyle]}>{desc}</Text>}
             <TextInput 
-                style={[styles.input, customInputStyle]} 
+                style={[styles.input, customInputStyle, themeBorderStyle, themeTextStyle]} 
                 placeholder={placeholder} 
                 onChangeText={onChangeText} 
                 value={value} 
                 returnKeyType={returnKeyType} 
                 keyboardType={keyboardType}
-                secureTextEntry={secureTextEntry} 
+                secureTextEntry={secureTextEntry}
+                placeholderTextColor={colorScheme === 'light' ? `#242c40` : `#BABAB4`} 
             />
         </View>
     );
@@ -34,12 +39,24 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 0.5,
-		borderColor: `#B3BAC9`,
+		// borderColor: `#B3BAC9`,
 		borderRadius: 5,
 		paddingHorizontal: 10,
 		paddingVertical: 8,
     },
     desc: {
         fontSize: 14,
-    }
+    },
+    lightThemeBorder: {
+		borderColor: `#242c40`,
+	},
+	darkThemeBorder: {
+		borderColor: `#d0d0c0`,
+	},
+	lightThemeText: {
+		color: `#242c40`,
+	},
+	darkThemeText: {
+		color: '#d0d0c0',
+	},
 });

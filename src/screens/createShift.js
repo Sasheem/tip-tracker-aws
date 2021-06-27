@@ -11,14 +11,13 @@ import {
 	TouchableOpacity,
 	Switch,
 	SafeAreaView,
-	ScrollView,
+	ScrollView, 
+	useColorScheme
 } from 'react-native';
-import { API, graphqlOperation } from 'aws-amplify';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import _ from 'lodash';
 import { AntDesign } from '@expo/vector-icons';
-import { createShift } from '../graphql/mutations';
 import RNPickerSelect from 'react-native-picker-select';
 
 import { Context as ShiftsContext } from '../context/ShiftsContext';
@@ -56,7 +55,6 @@ const CreateShift = ({ route }) => {
 	const [hours, setHours] = useState('');
 	const [hoursToggled, setHoursToggled] = useState(false);
 	const [job, setJob] = useState('default');
-	const [jobs, setJobs] = useState([]);
 	const [jobItems, setJobItems] = useState([]);
 	const [jobLabel, setJobLabel] = useState('');
 	const [tag, setTag] = useState('');
@@ -66,6 +64,7 @@ const CreateShift = ({ route }) => {
 	const [isOutTimePickerVisible, setOutTimePickerVisibility] = useState(false);
 	const [tagError, setTagError] = useState('');
 	const [formError, setFormError] = useState('');
+	const [colorScheme] = useState(useColorScheme());
 	
 	// load date from route
 	useEffect(() => {
@@ -213,15 +212,20 @@ const CreateShift = ({ route }) => {
 		setTags([]);
 	};
 
+	// set up theme colors
+	const themeContainerStyle = colorScheme === 'light' ? styles.lightContainer : styles.darkContainer;
+	const themeTextStyle = colorScheme === 'light' ? styles.lightThemeText : styles.darkThemeText;
+	const themeBorderStyle = colorScheme === 'light' ? styles.lightThemeBorder : styles.darkThemeBorder;
+	
 	return (
 		<KeyboardAvoidingView
 			behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
-			style={styles.container}
+			style={[styles.container, themeContainerStyle]}
 		>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 				<ScrollView>
 					<View style={styles.inner}>
-						{/* Date */}
+						{/* 1 Date + 2 Arrow components */}
 						<View
 							style={{
 								flexDirection: `row`,
@@ -233,14 +237,14 @@ const CreateShift = ({ route }) => {
 							<AntDesign
 								name='left'
 								size={28}
-								color='#06D6A0'
+								color='#39A0ED'
 								onPress={handleDateBackward}
 							/>
-							<Text style={{ fontSize: 24 }}>{date}</Text>
+							<Text style={[{ fontSize: 24 }, themeTextStyle]}>{date}</Text>
 							<AntDesign
 								name='right'
 								size={28}
-								color='#06D6A0'
+								color='#39A0ED'
 								onPress={handleDateForward}
 							/>
 						</View>
@@ -263,7 +267,7 @@ const CreateShift = ({ route }) => {
 
 							{/* Position Worked */}
 							<View style={styles.rowComponent}>
-								<Text style={[styles.subtitle, { paddingTop: 5 }]}>Position</Text>
+								<Text style={[styles.subtitle, { paddingTop: 5 }, themeTextStyle]}>Position</Text>
 								<RNPickerSelect
 									placeholder={{
 										label: 'Pick job',
@@ -286,7 +290,7 @@ const CreateShift = ({ route }) => {
 							{hoursToggled ? (
 								<View style={{ flexDirection: `row`, marginBottom: 20 }}>
 								<View style={styles.rowComponent}>
-									<Text style={styles.subtitle}>In Time</Text>
+									<Text style={[styles.subtitle, themeTextStyle]}>In Time</Text>
 									<TouchableOpacity
 										onPress={showInTimePicker}
 										style={styles.input}
@@ -306,7 +310,7 @@ const CreateShift = ({ route }) => {
 								</View>
 								<View style={styles.rowFiller} />
 								<View style={styles.rowComponent}>
-									<Text style={styles.subtitle}>Out Time</Text>
+									<Text style={[styles.subtitle, themeTextStyle]}>Out Time</Text>
 									<TouchableOpacity
 										onPress={showOutTimePicker}
 										style={styles.input}
@@ -329,7 +333,7 @@ const CreateShift = ({ route }) => {
 								<View>
 									<CustomInput
 										label='Hours' 
-										placeholder='4.5'
+										placeholder='Ex: 4.5'
 										customInputStyle={
 											Platform.OS === 'ios'
 											? styles.earningsIOS
@@ -353,9 +357,9 @@ const CreateShift = ({ route }) => {
 									width: `100%`,
 								}}
 							>
-								<Text style={{ marginRight: 10 }}>In/Out Time</Text>
+								<Text style={[{ marginRight: 10 }, themeTextStyle]}>In/Out Time</Text>
 								<Switch
-									trackColor={{ false: '#767577', true: '#06D6A0' }}
+									trackColor={{ false: '#767577', true: '#39A0ED' }}
 									thumbColor='#f4f3f4'
 									ios_backgroundColor='#3e3e3e'
 									onValueChange={toggleSwitch}
@@ -366,11 +370,12 @@ const CreateShift = ({ route }) => {
 
 						{/* Form Row: Shift Tags */}
 						<View>
-							<Text style={styles.subtitle}>Add tag</Text>
+							<Text style={[styles.subtitle, themeTextStyle]}>Add tag</Text>
 							<View
 								style={[
 									{ flexDirection: `row`, marginBottom: 10 },
 									styles.input,
+									themeBorderStyle
 								]}
 							>
 								<TextInput
@@ -378,6 +383,7 @@ const CreateShift = ({ route }) => {
 									style={{ flex: 3 }}
 									onChangeText={(text) => onTagChange(text)}
 									value={tag}
+									placeholderTextColor={colorScheme === 'light' ? `#242c40` : `#BABAB4`} 
 								/>
 								<View
 									style={{
@@ -469,9 +475,26 @@ const styles = StyleSheet.create({
 	},
 	textInput: {
 		height: 40,
-		borderColor: '#000000',
 		borderBottomWidth: 1,
 		marginBottom: 36,
+	},
+	lightContainer: {
+		backgroundColor: `white`,
+	},
+	darkContainer: {
+		backgroundColor: `#242c40`
+	},
+	lightThemeBorder: {
+		borderColor: `#242c40`,
+	},
+	darkThemeBorder: {
+		borderColor: `#d0d0c0`,
+	},
+	lightThemeText: {
+		color: `#242c40`,
+	},
+	darkThemeText: {
+		color: '#d0d0c0',
 	},
 	buttonText: {
 		color: `white`,
@@ -480,7 +503,7 @@ const styles = StyleSheet.create({
 	},
 	buttonSubmit: {
 		padding: 10,
-		backgroundColor: `#06D6A0`,
+		backgroundColor: `#39A0ED`,
 		alignItems: `center`,
 		borderRadius: 2.5,
 	},
@@ -499,7 +522,6 @@ const styles = StyleSheet.create({
 	},
 	input: {
 		borderWidth: 0.5,
-		borderColor: `#B3BAC9`,
 		borderRadius: 5,
 		paddingHorizontal: 10,
 		paddingVertical: 8,
@@ -514,10 +536,8 @@ const pickerStyles = StyleSheet.create({
 		borderWidth: 0.5,
 		borderColor: '#B3BAC9',
 		borderRadius: 6,
-		color: 'black',
 		paddingRight: 30, // to ensure the text is never behind the icon
 		marginBottom: 2,
-		color: `gray`,
 	},
 	inputAndroid: {
 		fontSize: 16,
@@ -526,7 +546,6 @@ const pickerStyles = StyleSheet.create({
 		borderWidth: 0.5,
 		borderColor: '#B3BAC9',
 		borderRadius: 6,
-		color: 'black',
 		paddingRight: 30, // to ensure the text is never behind the icon
 	},
 	iconContainer: {
