@@ -14,7 +14,7 @@ const MetricComponent = ({ title, value, date }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: `#06d6a0`,
+		backgroundColor: `#39A0ED`,
 		borderRadius: 6,
 		paddingHorizontal: 10,
 		paddingVertical: 10,

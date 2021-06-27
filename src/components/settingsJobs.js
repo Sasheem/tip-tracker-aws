@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
 	},
 	addButton: {
 		borderRadius: 50,
-		backgroundColor: `#06D6A0`,
+		backgroundColor: `#39A0ED`,
 		padding: 8,
 		shadowColor: '#000',
 		shadowOffset: {

@@ -126,7 +126,7 @@ const SettingsSetUp = () => {
                 <Text style={styles.label}>Notification reminder</Text>
                 <Text style={styles.desc}>Set up notification reminders to add your shifts</Text>
                 <Switch
-                    trackColor={{ false: '#767577', true: '#06D6A0' }}
+                    trackColor={{ false: '#767577', true: '#39A0ED' }}
                     thumbColor='#f4f3f4'
                     ios_backgroundColor='#3e3e3e'
                     onValueChange={toggleRemindersAsyncStorage}

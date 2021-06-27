@@ -92,7 +92,7 @@ const App = () => {
 							},
 						})}
 						tabBarOptions={{
-							activeTintColor: '#06D6A0',
+							activeTintColor: '#39A0ED',
 							inactiveTintColor: 'gray',
 							showLabel: false,
 							showIcon: true,
