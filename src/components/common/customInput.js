@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 16,
+        fontWeight: `500`,
         paddingTop: 5,
 		paddingBottom: 5,
 		borderBottomWidth: 0.5,
@@ -46,6 +47,8 @@ const styles = StyleSheet.create({
     },
     desc: {
         fontSize: 14,
+        width: `100%`,
+        paddingBottom: 5,
     },
     lightThemeBorder: {
 		borderColor: `#242c40`,
