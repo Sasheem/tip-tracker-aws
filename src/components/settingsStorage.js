@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 
 // local components
 import CustomInput from './common/customInput';
@@ -16,7 +16,10 @@ const SettingsStorage = () => {
         setExportError('');
     }
     const sendExport = () => {
-        console.log(`attempting to email export data`);
+        Alert.alert(`Export button pressed`);
+    }
+    const onSyncPress = () => {
+        Alert.alert(`Sync button pressed`);
     }
 
     return (
@@ -35,8 +38,9 @@ const SettingsStorage = () => {
             </View>
             <View style={styles.row}>
                 <Text style={styles.subtitle}>Local data</Text>
-                <Text style={styles.desc}>Sync up your local data with cloud data to keep your shifts up to date in your calendar.</Text>
-                {/* <Button label='Sync' onPress={onSyncPress} customStyle={{ alignSelf: `flex-end` }} /> */}
+                <Text style={styles.desc}>Sync up local data with cloud data.</Text>
+                <Text>Status: [unsynced or synced]</Text>
+                <Button label='Sync' onPress={onSyncPress} customStyle={{ alignSelf: `flex-end` }} />
             </View>
             
             <View style={styles.fillerMd} />
