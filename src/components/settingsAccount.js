@@ -6,15 +6,30 @@ import CustomInput from './common/customInput';
 import CustomButton from './common/customButton';
 
 const SettingsAccount = () => {
+	const [firstName, setFirstName] = useState('');
+	const [lastName, setLastName] = useState('');
 	const [email, setEmail] = useState('');
+	const [phone, setPhone] = useState('');
 	const [password, setPassword] = useState('');
 	const [newPassword, setNewPassword] = useState('');
 	const [confirm, setConfirm] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
 
 	// controlled form functions
-	const onEmailChange = text => {
+	const onFirstChange = text => {
+		setFirstName(text);
+		setErrorMessage('');
+	}
+	const onLastChange = text => {
+		setLastName(text);
+		setErrorMessage('');
+	}
+ 	const onEmailChange = text => {
 		setEmail(text);
+		setErrorMessage('');
+	}
+	const onPhoneChange = text => {
+		setPhone(text);
 		setErrorMessage('');
 	}
 	const onPasswordChange = text => {
@@ -29,12 +44,6 @@ const SettingsAccount = () => {
 		setConfirm(text);
 		setErrorMessage('');
 	}
-	const onPurchase = () => {
-		Alert.alert('Purchase button pressed!');
-
-		// run app store purchases
-		// if success save boolean var on AWS and Async Storage
-	};
 	const onSaveEmail = () => {
 		Alert.alert('attempting to save email');
 	}
@@ -43,23 +52,36 @@ const SettingsAccount = () => {
 	}
 	return (
 		<View style={styles.container}>
-			<Text style={styles.label}>Upgrade to Pro</Text>
-			<Text>Upgrade account to pro for access to features like tracking multiple jobs, shift metrics, and cloud storage.</Text>
-			<View style={styles.buttonContainer}>
-				<CustomButton onPress={onPurchase} label='Purchase' />
-			</View>
+			<Text style={styles.title}>Personal Info</Text>
+			<CustomInput 
+				label='First name'
+				onChangeText={text => onFirstChange(text)}
+				value={firstName}
+				keyboardType='default'
+			/>
+			<CustomInput 
+				label='Last name'
+				onChangeText={text => onLastChange(text)}
+				value={lastName}
+				keyboardType='default'
+			/>
+			<View style={styles.horizontalRule} />
+			<Text style={styles.title}>Contact Info</Text>
 			<CustomInput 
 				label='Email'
-				desc='Update the e-mail on file.'
 				placeholder='example@email.com'
 				onChangeText={(text) => onEmailChange(text)}
 				value={email}
 				keyboardType='default'
 			/>
-			<View style={styles.buttonContainer}>
-				<CustomButton onPress={onSaveEmail} label='Save email' />
-			</View>
-			<View style={styles.horizontalRule} />
+			<CustomInput 
+				label='Phone'
+				placeholder='(555)-555-5555'
+				onChangeText={(text) => onPhoneChange(text)}
+				value={phone}
+				keyboardType='phone-pad'
+			/>
+			
 			<CustomInput 
 				label='Current password'
 				placeholder='Add password requirements'
@@ -95,6 +117,10 @@ const styles = StyleSheet.create({
 		paddingRight: 24,
 		flex: 1,
 		alignItems: `flex-start`,
+	},
+	title: {
+		fontSize: 15,
+		fontWeight: `700`
 	},
 	label: {
 		fontSize: 16,
