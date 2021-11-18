@@ -23,20 +23,20 @@ const Settings = ({ navigation }) => {
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.userInfoContainer}>
+			{/* <View style={styles.userInfoContainer}>
 				<Text style={styles.subtitleLg}>Account info</Text>
 				{!_.isEmpty(userInfo) && <Text>{userInfo.attributes.email}</Text>} 
 				{console.log(userInfo)}
-			</View>
+			</View> */}
 			<View style={styles.settingsContainer}>
-				<Text style={styles.subtitleMd}>Settings</Text>
+				<Text style={styles.subtitleMd}>Personal Settings</Text>
 				<TouchableOpacity
 					style={styles.row}
 					onPress={() => {
 						navigation.navigate('Account');
 					}}
 				>
-					<Text>Account</Text>
+					<Text>Personal Info</Text>
 					<AntDesign name='right' size={24} color='black' />
 				</TouchableOpacity>
 				<TouchableOpacity
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
 	container: {
 		display: `flex`,
 		flex: 1,
-		padding: 24,
+		padding: 18,
 	},
 	row: {
 		flexDirection: `row`,
@@ -106,8 +106,8 @@ const styles = StyleSheet.create({
 		fontWeight: `600`,
 	},
 	subtitleMd: {
-		fontSize: 20,
-		fontWeight: `500`,
+		fontSize: 15,
+		fontWeight: `700`,
 	},
 	settingsContainer: {
 		flex: 5,
