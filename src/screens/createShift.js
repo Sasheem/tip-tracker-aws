@@ -49,6 +49,7 @@ const CreateShift = ({ route }) => {
 
 	// state
 	const [date, setDate] = useState(moment().format('L'));
+	const [dayOfWeek, setDayOfWeek] = useState(moment().format('dddd'));
 	const [amount, setAmount] = useState('');
 	const [inTime, setInTime] = useState('');
 	const [outTime, setOutTime] = useState('');
@@ -124,12 +125,19 @@ const CreateShift = ({ route }) => {
 
 
 	// handle date back arrow pressed
-	const handleDateBackward = () =>
+	const handleDateBackward = () => {
 		setDate(moment(date, 'L').subtract(1, 'day').format('L'));
+		setDayOfWeek(moment(date, 'L').subtract(1, 'day').format('dddd'));
+	}
+		
+		
 
 	// handle date forward arrow pressed
-	const handleDateForward = () =>
+	const handleDateForward = () => {
 		setDate(moment(date, 'L').add(1, 'day').format('L'));
+		setDayOfWeek(moment(date, 'L').add(1, 'day').format('dddd'));
+	}
+		
 
 	// handle hours toggled
 	const toggleSwitch = () => {
@@ -224,6 +232,9 @@ const CreateShift = ({ route }) => {
 		>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 				<ScrollView>
+					<View style={styles.innerDayOfWeek}>
+						<Text style={styles.dayOfWeek}>{dayOfWeek}</Text>
+					</View>
 					<View style={styles.inner}>
 						{/* 1 Date + 2 Arrow components */}
 						<View
@@ -448,8 +459,17 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 	},
+	innerDayOfWeek: {
+		flex: 0.1,
+		width: `100%`,
+		justifyContent: `flex-end`,
+		alignItems: `center`,
+	},
+	dayOfWeek: {
+		fontSize: 18,
+	},
 	inner: {
-		paddingTop: 24,
+		paddingTop: 8,
 		paddingLeft: 48,
 		paddingRight: 48,
 		flex: 1,
