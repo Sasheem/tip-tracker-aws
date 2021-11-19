@@ -81,13 +81,13 @@ const App = () => {
 								let iconName;
 
 								if (route.name === 'Shift') {
-									iconName = `md-add`;
+									iconName = `add-circle`;
 								} else if (route.name === 'Calendar') {
 									iconName = `md-calendar`;
 								} else if (route.name === 'Metrics') {
-									iconName = `md-stats`;
+									iconName = `stats-chart`;
 								} else if (route.name === 'Settings') {
-									iconName = `md-settings`;
+									iconName = `settings`;
 								}
 
 								return <Ionicons name={iconName} size={25} color={color} />;
