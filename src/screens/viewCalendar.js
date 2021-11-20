@@ -84,12 +84,19 @@ const ViewCalendar = ({ navigation }) => {
 		console.log(`changing current date to ${date.dateString}`);
 	};
 
+	// helper function - determine if calendar cell is current date
+	const isCellCurrentDay = (date) => {
+		let current = moment().format('YYYY-MM-DD');
+		return current === date ? true : false;
+	}
+
 	// renderDayComponent - find all shifts for each day and render amount + hourly
 	const renderDayComponent = (date, state) => {
 		var amount = 0.0;
 		var hours = 0.0;
 		var hourly = 0.0;
-
+		var todayComponent = isCellCurrentDay(date.dateString);
+		
 		const results = fetchedShifts.filter(
 			(shift) =>
 				date.dateString ===
@@ -120,7 +127,10 @@ const ViewCalendar = ({ navigation }) => {
 			hourly = amount / hours;
 
 			return (
-				<View>
+				<View style={{
+					borderColor: todayComponent ? `#DB5461` : `white`,
+					borderWidth: 1
+				}}>
 					<TouchableOpacity onPress={() => setCurrentDetail({ ...results })}>
 						<View style={{
 							alignSelf: `flex-start`,
@@ -135,7 +145,6 @@ const ViewCalendar = ({ navigation }) => {
 								style={{
 									textAlign: 'left',
 									color: state === 'disabled' ? 'gray' : colorScheme === 'light' ? `#242c40` : `#BABAB4`,
-									
 								}}
 							>
 								{date.day}
@@ -154,7 +163,7 @@ const ViewCalendar = ({ navigation }) => {
 
 		return (
 			<TouchableOpacity onPress={() => handleEmptyDaySelected(date)}>
-				<View style={{ height: 35, width: 35 }}>
+				<View style={{ height: 35, width: 35, borderColor: todayComponent ? `#DB5461` : `white`, borderWidth: 1 }}>
 					<Text
 						style={{
 							textAlign: 'left',
