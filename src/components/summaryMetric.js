@@ -5,7 +5,7 @@ const SummaryMetric = ({ title, value }) => {
 	return (
 		<View style={styles.container}>
 			<Text>{title}</Text>
-			<Text>{value}</Text>
+			<Text style={styles.value}>{value}</Text>
 		</View>
 	);
 };
@@ -15,7 +15,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	title: {},
-	value: {},
+	value: {
+		color: `#829191`,
+	},
 });
 
 export default SummaryMetric;

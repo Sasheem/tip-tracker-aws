@@ -20,7 +20,10 @@ import SummaryMetric from '../components/summaryMetric';
  */
 
 const ViewMetrics = () => {
+	// context
 	const { state: fetchedShifts, getShifts } = useContext(ShiftsContext);
+
+	// state
 	const [dailyLabel, setDailyLabel] = useState(moment().format('MM-DD-YYYY'));
 	const [daily, setDaily] = useState({});
 	const [weeklyLabel, setWeeklyLabel] = useState(moment().format('w'));
@@ -356,7 +359,7 @@ const ViewMetrics = () => {
 				</View>
 				
 				{/* Lifetime Row */}
-				<Text style={styles.title}>Lifetime</Text>
+				<Text style={styles.title}>Total stats</Text>
 				<View style={styles.flexRow}>
 					<MetricComponent
 						title='Income'
@@ -510,7 +513,6 @@ const styles = StyleSheet.create({
 	flexRow: {
 		flexDirection: `row`,
 		marginBottom: Platform.OS === 'ios' ? 15 : 10,
-		paddingTop: 5,
 	},
 	flexFillLarge: {
 		flex: 2,
