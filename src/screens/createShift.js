@@ -555,6 +555,7 @@ const pickerStyles = StyleSheet.create({
 		paddingVertical: 8,
 		borderWidth: 0.5,
 		borderColor: '#B3BAC9',
+		color: '#B3BAC9',
 		borderRadius: 6,
 		paddingRight: 30, // to ensure the text is never behind the icon
 		marginBottom: 2,
@@ -565,6 +566,7 @@ const pickerStyles = StyleSheet.create({
 		paddingVertical: 8,
 		borderWidth: 0.5,
 		borderColor: '#B3BAC9',
+		color: '#B3BAC9',
 		borderRadius: 6,
 		paddingRight: 30, // to ensure the text is never behind the icon
 	},
