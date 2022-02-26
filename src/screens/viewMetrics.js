@@ -451,7 +451,8 @@ const ViewMetrics = () => {
 						Icon={() => <AntDesign name='down' size={20} color='#D1D5DE' />}
 						style={pickerStyles}
 					/>
-					{monthly.hourly && (
+					
+					{Object.keys(monthly).length !== 0 && (
 						<View style={styles.flexRow}>
 							<SummaryMetric title='Earnings' value={`$${monthly.amount}`} />
 							<View style={styles.flexFillSm} />
