@@ -227,7 +227,8 @@ const CreateShift = ({ route }) => {
 	
 	return (
 		<KeyboardAvoidingView
-			behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+			// behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+			behavior='padding'
 			style={[styles.container, themeContainerStyle]}
 		>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -444,7 +445,7 @@ const CreateShift = ({ route }) => {
 							<Text style={{ color: `red` }}>{formError}</Text>
 						)}
 
-						<View style={styles.hardFiller} />
+						{/* <View style={styles.hardFiller} /> */}
 					</View>
 				</ScrollView>
 			</TouchableWithoutFeedback>

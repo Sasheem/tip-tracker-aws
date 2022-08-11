@@ -37,7 +37,6 @@ const ViewCalendar = ({ navigation }) => {
 	const themeTextStyle = colorScheme === 'light' ? styles.lightThemeText : styles.darkThemeText;
 	const themeBorderStyle = colorScheme === 'light' ? styles.lightThemeBorder : styles.darkThemeBorder;
 	console.log(`Color Scheme: ${colorScheme}`);
-
 	// fetch shifts when component mounts and shifts state updates
 	useEffect(() => {
 		console.log(`fetching shifts`);
